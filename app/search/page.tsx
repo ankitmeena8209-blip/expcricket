@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useSearch } from "@/hooks/useSearch";
@@ -8,7 +8,7 @@ import Badge from "@/components/common/Badge";
 import SkeletonLoader from "@/components/common/SkeletonLoader";
 import EmptyState from "@/components/common/EmptyState";
 
-export default function SearchPage() {
+function SearchContent() {
   const searchParams = useSearchParams();
   const initialQ = searchParams.get("q") || "";
   const { query, setQuery, results, loading } = useSearch(initialQ);
@@ -83,5 +83,13 @@ export default function SearchPage() {
         />
       )}
     </div>
+  );
+}
+
+export default function SearchPage() {
+  return (
+    <Suspense fallback={<SkeletonLoader className="h-64 w-full" />}>
+      <SearchContent />
+    </Suspense>
   );
 }

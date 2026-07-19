@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 
 export function useFavorites() {
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
+    setIsMounted(true);
     try {
       const stored = localStorage.getItem("exp_favorites");
       if (stored) {
@@ -30,7 +32,7 @@ export function useFavorites() {
     });
   };
 
-  const isFavorite = (id: string) => favorites.includes(id);
+  const isFavorite = (id: string) => (isMounted ? favorites.includes(id) : false);
 
-  return { favorites, toggleFavorite, isFavorite };
+  return { favorites: isMounted ? favorites : [], toggleFavorite, isFavorite, isMounted };
 }

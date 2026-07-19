@@ -1,12 +1,12 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { MOCK_MATCHES } from "@/lib/mockData/matches";
 import Badge from "@/components/common/Badge";
-import StatCard from "@/components/common/StatCard";
+import SkeletonLoader from "@/components/common/SkeletonLoader";
 
-export default function MatchAnalysisPage() {
+function MatchAnalysisContent() {
   const searchParams = useSearchParams();
   const matchId = searchParams.get("id") || "ind-vs-aus-bgt-test1";
   const match = MOCK_MATCHES.find((m) => m.id === matchId) || MOCK_MATCHES[0];
@@ -82,5 +82,13 @@ export default function MatchAnalysisPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MatchAnalysisPage() {
+  return (
+    <Suspense fallback={<SkeletonLoader className="h-96 w-full" />}>
+      <MatchAnalysisContent />
+    </Suspense>
   );
 }

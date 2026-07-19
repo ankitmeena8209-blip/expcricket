@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { usePlayer } from "@/hooks/usePlayer";
 import PlayerHeader from "@/components/player/PlayerHeader";
@@ -12,7 +12,7 @@ import RadarChart from "@/components/charts/RadarChart";
 import BowlerMatchupTable from "@/components/player/BowlerMatchupTable";
 import { FormatType } from "@/types/player";
 
-export default function PlayerIntelligencePage() {
+function PlayerIntelligenceContent() {
   const searchParams = useSearchParams();
   const playerId = searchParams.get("id") || "virat-kohli";
   const { player, loading, error } = usePlayer(playerId);
@@ -193,5 +193,13 @@ export default function PlayerIntelligencePage() {
       {/* Bowler Matchups */}
       {player.matchups && <BowlerMatchupTable matchups={player.matchups} />}
     </div>
+  );
+}
+
+export default function PlayerIntelligencePage() {
+  return (
+    <Suspense fallback={<SkeletonLoader className="h-96 w-full" />}>
+      <PlayerIntelligenceContent />
+    </Suspense>
   );
 }

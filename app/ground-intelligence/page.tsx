@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useGround } from "@/hooks/useGround";
 import StatCard from "@/components/common/StatCard";
@@ -11,7 +11,7 @@ import ErrorState from "@/components/common/ErrorState";
 import BoundaryDiagram from "@/components/charts/BoundaryDiagram";
 import PitchMap from "@/components/charts/PitchMap";
 
-export default function GroundIntelligencePage() {
+function GroundIntelligenceContent() {
   const searchParams = useSearchParams();
   const groundId = searchParams.get("id") || "mcg";
   const { ground, loading, error } = useGround(groundId);
@@ -170,5 +170,13 @@ export default function GroundIntelligencePage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function GroundIntelligencePage() {
+  return (
+    <Suspense fallback={<SkeletonLoader className="h-96 w-full" />}>
+      <GroundIntelligenceContent />
+    </Suspense>
   );
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { CompareService, ComparisonResult } from "@/services/compareService";
 import { MOCK_PLAYERS } from "@/lib/mockData/players";
@@ -12,7 +12,7 @@ import SkeletonLoader from "@/components/common/SkeletonLoader";
 import { Player } from "@/types/player";
 import { Ground } from "@/types/ground";
 
-export default function CompareEnginePage() {
+function CompareContent() {
   const searchParams = useSearchParams();
   const initialPlayerA = searchParams.get("playerA") || "virat-kohli";
   const initialPlayerB = searchParams.get("playerB") || "travis-head";
@@ -215,5 +215,13 @@ export default function CompareEnginePage() {
         </div>
       ) : null}
     </div>
+  );
+}
+
+export default function CompareEnginePage() {
+  return (
+    <Suspense fallback={<SkeletonLoader className="h-64 w-full" />}>
+      <CompareContent />
+    </Suspense>
   );
 }

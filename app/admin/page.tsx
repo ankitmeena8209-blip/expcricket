@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import StatCard from "@/components/common/StatCard";
-import Badge from "@/components/common/Badge";
 import Button from "@/components/common/Button";
 
 export default function AdminDashboardPage() {
@@ -51,33 +51,41 @@ export default function AdminDashboardPage() {
           <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30 space-y-2">
             <span className="text-xs font-bold text-on-surface block">Players Repository</span>
             <p className="text-[11px] font-mono-data text-outline">Manage player stats, roles, and profiles.</p>
-            <Button variant="outline" size="sm" className="w-full" onClick={() => window.location.href = '/admin/players'}>
-              Manage Players
-            </Button>
+            <Link href="/admin/players" className="block">
+              <Button variant="outline" size="sm" className="w-full">
+                Manage Players
+              </Button>
+            </Link>
           </div>
 
           <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30 space-y-2">
             <span className="text-xs font-bold text-on-surface block">Ground Telemetry</span>
             <p className="text-[11px] font-mono-data text-outline">Edit venue boundary maps & pitch profiles.</p>
-            <Button variant="outline" size="sm" className="w-full" onClick={() => window.location.href = '/admin/grounds'}>
-              Manage Grounds
-            </Button>
+            <Link href="/admin/grounds" className="block">
+              <Button variant="outline" size="sm" className="w-full">
+                Manage Grounds
+              </Button>
+            </Link>
           </div>
 
           <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30 space-y-2">
             <span className="text-xs font-bold text-on-surface block">AI Response Cache</span>
             <p className="text-[11px] font-mono-data text-outline">Inspect & purge stored AI answers.</p>
-            <Button variant="outline" size="sm" className="w-full" onClick={() => window.location.href = '/admin/ai-cache'}>
-              Inspect Cache
-            </Button>
+            <Link href="/admin/ai-cache" className="block">
+              <Button variant="outline" size="sm" className="w-full">
+                Inspect Cache
+              </Button>
+            </Link>
           </div>
 
           <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30 space-y-2">
             <span className="text-xs font-bold text-on-surface block">System Configuration</span>
             <p className="text-[11px] font-mono-data text-outline">Configure keys & active AI models.</p>
-            <Button variant="outline" size="sm" className="w-full" onClick={() => window.location.href = '/admin/settings'}>
-              System Settings
-            </Button>
+            <Link href="/admin/settings" className="block">
+              <Button variant="outline" size="sm" className="w-full">
+                System Settings
+              </Button>
+            </Link>
           </div>
         </div>
       </div>

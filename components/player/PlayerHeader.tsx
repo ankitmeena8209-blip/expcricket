@@ -2,6 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { Player } from "@/types/player";
 import Badge from "../common/Badge";
 import Button from "../common/Button";
@@ -89,14 +90,11 @@ export default function PlayerHeader({ player }: PlayerHeaderProps) {
             {bookmarked ? "Bookmarked" : "Bookmark Player"}
           </Button>
 
-          <Button
-            variant="outline"
-            size="sm"
-            icon="compare_arrows"
-            onClick={() => window.location.href = `/compare?playerA=${player.id}`}
-          >
-            Compare
-          </Button>
+          <Link href={`/compare?playerA=${player.id}`}>
+            <Button variant="outline" size="sm" icon="compare_arrows">
+              Compare
+            </Button>
+          </Link>
         </div>
       </div>
     </div>

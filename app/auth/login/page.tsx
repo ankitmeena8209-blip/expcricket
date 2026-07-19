@@ -2,17 +2,18 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Button from "@/components/common/Button";
 import Badge from "@/components/common/Badge";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    // Placeholder login flow
-    window.location.href = "/admin";
+    router.push("/admin");
   };
 
   return (
