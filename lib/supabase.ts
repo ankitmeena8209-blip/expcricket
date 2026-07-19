@@ -1,31 +1,20 @@
-// Reusable Supabase Client Wrapper for Vercel & Supabase
-// Ensures credentials are read safely from process.env without exposing server keys to the client.
+import { createClient } from "@supabase/supabase-js";
 
-export const getSupabaseConfig = () => {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://your-project.supabase.co";
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "your_supabase_anon_key_placeholder";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-  const isConfigured =
-    Boolean(supabaseUrl) &&
-    Boolean(supabaseAnonKey) &&
+export const isSupabaseConfigured = Boolean(
+  supabaseUrl &&
+    supabaseAnonKey &&
+    supabaseUrl.startsWith("https://") &&
     !supabaseUrl.includes("your-project") &&
-    !supabaseAnonKey.includes("placeholder");
+    !supabaseAnonKey.includes("placeholder")
+);
 
-  return { supabaseUrl, supabaseAnonKey, isConfigured };
-};
+// Fallback values prevent @supabase/supabase-js from throwing invalid URL errors during SSG build
+const safeUrl = isSupabaseConfigured ? supabaseUrl : "https://placeholder-project.supabase.co";
+const safeAnonKey = isSupabaseConfigured
+  ? supabaseAnonKey
+  : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.placeholder";
 
-export class SupabaseAdapter {
-  static isReady(): boolean {
-    return getSupabaseConfig().isConfigured;
-  }
-
-  // Generic query wrapper ready for future Supabase client initialization
-  static async queryTable<T>(tableName: string): Promise<T[] | null> {
-    if (!this.isReady()) {
-      return null;
-    }
-    // Future Supabase client call:
-    // const { data, error } = await supabase.from(tableName).select('*');
-    return null;
-  }
-}
+export const supabase = createClient(safeUrl, safeAnonKey);
