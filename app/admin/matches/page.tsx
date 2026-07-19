@@ -10,6 +10,7 @@ import SkeletonLoader from "@/components/common/SkeletonLoader";
 export default function AdminMatchesPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
 
   useEffect(() => {
     loadMatches();
@@ -22,6 +23,20 @@ export default function AdminMatchesPage() {
     setLoading(false);
   };
 
+  const handleSyncCricketData = async () => {
+    setSyncing(true);
+    try {
+      const res = await fetch("/api/cricket-sync", { method: "POST" });
+      if (res.ok) {
+        await loadMatches();
+      }
+    } catch (err) {
+      console.error("Sync error:", err);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const handleDelete = async (id: string) => {
     await MatchService.deleteMatch(id);
     setMatches((prev) => prev.filter((m) => m.id !== id));
@@ -29,12 +44,23 @@ export default function AdminMatchesPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-2">
         <div>
           <h2 className="text-xl font-headline font-bold text-on-surface">Matches & Scorecard Control</h2>
           <p className="text-xs font-mono-data text-outline">Manage live matches, scorecard inputs, and probability timelines.</p>
         </div>
-        <Badge variant="primary">{matches.length} MATCHES</Badge>
+        <div className="flex items-center gap-2">
+          <Badge variant="primary">{matches.length} MATCHES</Badge>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSyncCricketData}
+            disabled={syncing}
+            icon="sync"
+          >
+            {syncing ? "Syncing CricAPI..." : "Sync CricketData.org"}
+          </Button>
+        </div>
       </div>
 
       {loading ? (
