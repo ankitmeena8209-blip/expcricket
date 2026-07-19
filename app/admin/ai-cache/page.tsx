@@ -1,47 +1,85 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { AIService } from "@/services/aiService";
+import { AICacheEntry } from "@/types/ai";
 import Button from "@/components/common/Button";
 import Badge from "@/components/common/Badge";
+import SkeletonLoader from "@/components/common/SkeletonLoader";
 
 export default function AdminAICachePage() {
-  const [cachedEntries, setCachedEntries] = useState(AIService.getCachedEntries());
+  const [cacheEntries, setCacheEntries] = useState<AICacheEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadCache();
+  }, []);
+
+  const loadCache = async () => {
+    setLoading(true);
+    if (isSupabaseConfigured) {
+      try {
+        const { data, error } = await supabase.from("ai_cache_entries").select("*");
+        if (data && !error && data.length > 0) {
+          const mapped: AICacheEntry[] = data.map((item) => ({
+            cacheKey: item.cache_key,
+            request: { prompt: item.prompt, provider: item.provider },
+            response: item.response,
+            expiresAt: item.expires_at,
+          }));
+          setCacheEntries(mapped);
+          setLoading(false);
+          return;
+        }
+      } catch (err) {
+        console.warn("Supabase AI cache query fallback:", err);
+      }
+    }
+    setCacheEntries(AIService.getCachedEntries());
+    setLoading(false);
+  };
 
   const handleClearCache = () => {
     AIService.clearCache();
-    setCachedEntries([]);
+    setCacheEntries([]);
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-headline font-bold text-on-surface">AI Response Cache Dashboard</h2>
-        <Button variant="danger" size="sm" icon="delete" onClick={handleClearCache}>
-          Purge Cache
-        </Button>
+        <div>
+          <h2 className="text-xl font-headline font-bold text-on-surface">AI Telemetry Response Cache</h2>
+          <p className="text-xs font-mono-data text-outline">Stored Groq Llama 3.3 predictions and prompt response cache.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="tertiary">{cacheEntries.length} CACHED RESPONSES</Badge>
+          <Button variant="outline" size="sm" onClick={handleClearCache} icon="delete_sweep">
+            Clear Cache
+          </Button>
+        </div>
       </div>
 
-      <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/30">
-        {cachedEntries.length === 0 ? (
-          <div className="py-8 text-center text-xs font-mono-data text-outline">
-            No cached AI query responses currently stored.
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {cachedEntries.map((entry, i) => (
-              <div key={i} className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-xs font-mono-data">
-                <div className="flex justify-between items-center mb-1">
-                  <Badge variant="tertiary">{entry.response.provider.toUpperCase()}</Badge>
-                  <span className="text-[10px] text-outline">{entry.response.timestamp}</span>
-                </div>
-                <div className="font-bold text-on-surface mb-1">Prompt: "{entry.request.prompt}"</div>
-                <div className="text-on-surface-variant truncate">{entry.response.content}</div>
+      {loading ? (
+        <SkeletonLoader className="h-48 w-full" />
+      ) : cacheEntries.length > 0 ? (
+        <div className="space-y-3">
+          {cacheEntries.map((entry, idx) => (
+            <div key={idx} className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 font-mono-data text-xs space-y-1">
+              <div className="flex justify-between items-center text-outline text-[10px]">
+                <span>KEY: {entry.cacheKey}</span>
+                <span>EXPIRES: {new Date(entry.expiresAt).toLocaleTimeString()}</span>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+              <p className="text-on-surface font-bold">Prompt: {entry.request.prompt}</p>
+              <p className="text-on-surface-variant text-[11px] line-clamp-2">{entry.response.content}</p>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="p-8 text-center bg-surface-container-low border border-outline-variant/30 rounded-2xl font-mono-data text-xs text-outline">
+          No cached AI response entries found. Run queries on the AI Analyst page to populate cache.
+        </div>
+      )}
     </div>
   );
 }
