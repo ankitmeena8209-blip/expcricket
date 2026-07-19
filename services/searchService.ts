@@ -71,4 +71,8 @@ export class SearchService {
 
     return results;
   }
+
+  static async globalSearch(query: string): Promise<SearchResultItem[]> {
+    return this.searchAll(query);
+  }
 }
