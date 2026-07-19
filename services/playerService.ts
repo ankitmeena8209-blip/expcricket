@@ -32,6 +32,18 @@ export class PlayerService {
     return player || MOCK_PLAYERS[0];
   }
 
+  static async searchPlayers(query: string): Promise<Player[]> {
+    const players = await this.getAllPlayers();
+    if (!query.trim()) return players;
+    const q = query.toLowerCase();
+    return players.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.fullName.toLowerCase().includes(q) ||
+        p.country.toLowerCase().includes(q)
+    );
+  }
+
   static async getFeaturedPlayer(): Promise<Player> {
     const player = await this.getPlayerById("virat-kohli");
     return player || MOCK_PLAYERS[0];
