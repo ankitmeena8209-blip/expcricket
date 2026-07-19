@@ -3,17 +3,31 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { AuthService } from "@/services/authService";
 import Button from "@/components/common/Button";
 import Badge from "@/components/common/Badge";
+import ErrorState from "@/components/common/ErrorState";
 
 export default function LoginPage() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/admin");
+    setErrorMessage("");
+    setLoading(true);
+
+    const res = await AuthService.login(email, password);
+    setLoading(false);
+
+    if (res.success) {
+      router.push("/admin");
+    } else {
+      setErrorMessage(res.error || "Invalid login credentials. Please check your email and password.");
+    }
   };
 
   return (
@@ -23,19 +37,22 @@ export default function LoginPage() {
           E
         </div>
         <h1 className="font-headline font-bold text-2xl text-on-surface">EXP Cricket Portal</h1>
-        <Badge variant="primary">SECURE LOGIN</Badge>
+        <Badge variant="primary">SUPABASE AUTH SECURE LOGIN</Badge>
       </div>
+
+      {errorMessage && <ErrorState message={errorMessage} />}
 
       <form onSubmit={handleLogin} className="space-y-4">
         <div className="space-y-1">
-          <label className="text-xs font-mono-data text-outline block">Username / Email</label>
+          <label className="text-xs font-mono-data text-outline block">Email Address</label>
           <input
-            type="text"
+            type="email"
             required
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            placeholder="admin"
-            className="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none focus:border-primary"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="admin@expcricket.com"
+            disabled={loading}
+            className="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none focus:border-primary disabled:opacity-50"
           />
         </div>
 
@@ -47,12 +64,13 @@ export default function LoginPage() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="••••••••"
-            className="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none focus:border-primary"
+            disabled={loading}
+            className="w-full px-4 py-3 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none focus:border-primary disabled:opacity-50"
           />
         </div>
 
-        <Button variant="primary" type="submit" className="w-full" icon="login">
-          Sign In to Admin Portal
+        <Button variant="primary" type="submit" className="w-full" disabled={loading} icon="login">
+          {loading ? "Authenticating with Supabase..." : "Sign In to Admin Portal"}
         </Button>
       </form>
 

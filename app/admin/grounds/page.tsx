@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { GroundService } from "@/services/groundService";
+import { StorageService } from "@/services/storageService";
 import { Ground } from "@/types/ground";
 import Button from "@/components/common/Button";
 import Badge from "@/components/common/Badge";
@@ -12,6 +13,8 @@ export default function AdminGroundsPage() {
   const [loading, setLoading] = useState(true);
   const [newGroundName, setNewGroundName] = useState("");
   const [newGroundCity, setNewGroundCity] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     loadGrounds();
@@ -27,16 +30,29 @@ export default function AdminGroundsPage() {
   const handleAddGround = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newGroundName.trim()) return;
+
+    setUploading(true);
+    let imageUrl: string | undefined = undefined;
+
+    if (selectedFile) {
+      const uploaded = await StorageService.uploadImage("ground-images", selectedFile);
+      if (uploaded) imageUrl = uploaded;
+    }
+
     const success = await GroundService.createGround({
       name: newGroundName,
       shortName: newGroundName,
       city: newGroundCity || "London",
       country: "England",
       pitchType: "Pace-Friendly",
+      imageUrl: imageUrl || "https://images.unsplash.com/photo-1540747913346-19e32dc3e97e?auto=format&fit=crop&w=1200&q=80",
     });
+
+    setUploading(false);
     if (success) {
       setNewGroundName("");
       setNewGroundCity("");
+      setSelectedFile(null);
       loadGrounds();
     } else {
       alert("Note: Added locally. Connect Supabase database to persist.");
@@ -59,25 +75,42 @@ export default function AdminGroundsPage() {
         <Badge variant="tertiary">{grounds.length} VENUES</Badge>
       </div>
 
-      {/* Add Ground Form */}
-      <form onSubmit={handleAddGround} className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 flex flex-col sm:flex-row gap-3">
-        <input
-          type="text"
-          placeholder="Stadium Name (e.g. Lord's Cricket Ground)"
-          value={newGroundName}
-          onChange={(e) => setNewGroundName(e.target.value)}
-          className="flex-1 p-2.5 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none"
-        />
-        <input
-          type="text"
-          placeholder="City (e.g. London)"
-          value={newGroundCity}
-          onChange={(e) => setNewGroundCity(e.target.value)}
-          className="w-full sm:w-48 p-2.5 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none"
-        />
-        <Button variant="primary" size="sm" type="submit" icon="add">
-          Add Ground
-        </Button>
+      {/* Add Ground Form with Supabase Storage File Upload */}
+      <form onSubmit={handleAddGround} className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 flex flex-col gap-3">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <input
+            type="text"
+            placeholder="Stadium Name (e.g. Lord's Cricket Ground)"
+            value={newGroundName}
+            onChange={(e) => setNewGroundName(e.target.value)}
+            disabled={uploading}
+            className="flex-1 p-2.5 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none"
+          />
+          <input
+            type="text"
+            placeholder="City (e.g. London)"
+            value={newGroundCity}
+            onChange={(e) => setNewGroundCity(e.target.value)}
+            disabled={uploading}
+            className="w-full sm:w-48 p-2.5 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none"
+          />
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <span className="text-xs font-mono-data text-outline">Stadium Photo (Supabase Storage):</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+              className="text-xs font-mono-data text-outline file:mr-2 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:bg-surface-container-high file:text-on-surface hover:file:bg-surface-variant cursor-pointer"
+            />
+          </div>
+
+          <Button variant="primary" size="sm" type="submit" disabled={uploading || !newGroundName.trim()} icon="upload">
+            {uploading ? "Uploading to Storage..." : "Add Venue to Supabase"}
+          </Button>
+        </div>
       </form>
 
       {/* Grounds Table */}
