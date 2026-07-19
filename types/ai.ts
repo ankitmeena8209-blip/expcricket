@@ -1,4 +1,4 @@
-export type AIProvider = "gemini" | "openai" | "grok";
+export type AIProvider = "gemini" | "openai" | "groq";
 
 export interface AIAnalysisRequest {
   prompt: string;

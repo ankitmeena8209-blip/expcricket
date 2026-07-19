@@ -38,14 +38,14 @@ export default function AICricketAnalystPage() {
             <Badge variant="tertiary">MULTI-PROVIDER ENGINE</Badge>
           </div>
           <p className="text-xs font-mono-data text-outline">
-            Configurable provider strategy: Gemini, OpenAI, Grok with response caching layer
+            Configurable provider strategy: Gemini, OpenAI, Groq with response caching layer
           </p>
         </div>
 
         {/* AI Provider Switcher */}
         <div className="flex items-center gap-2 p-1.5 bg-surface-container-high border border-outline-variant/30 rounded-xl">
           <span className="text-xs font-mono-data text-outline pl-2 hidden sm:inline">Active Model:</span>
-          {(["gemini", "openai", "grok"] as AIProvider[]).map((p) => (
+          {(["groq", "gemini", "openai"] as AIProvider[]).map((p) => (
             <button
               key={p}
               onClick={() => setProvider(p)}

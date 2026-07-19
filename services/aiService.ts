@@ -5,11 +5,11 @@ const aiCacheStore: Map<string, AICacheEntry> = new Map();
 
 export class AIService {
   static getActiveProvider(): AIProvider {
-    const provider = process.env.DEFAULT_AI_PROVIDER as AIProvider;
-    if (process.env.GROK_API_KEY) return "grok";
+    if (process.env.GROQ_API_KEY) return "groq";
     if (process.env.OPENAI_API_KEY) return "openai";
     if (process.env.GEMINI_API_KEY) return "gemini";
-    return provider && ["gemini", "openai", "grok"].includes(provider) ? provider : "grok";
+    const provider = process.env.DEFAULT_AI_PROVIDER as AIProvider;
+    return provider && ["gemini", "openai", "groq"].includes(provider) ? provider : "groq";
   }
 
   static async analyzeQuery(req: AIAnalysisRequest): Promise<AIAnalysisResponse> {
@@ -24,17 +24,17 @@ export class AIService {
       }
     }
 
-    // 2. Real Grok API Call if GROK_API_KEY is available
-    if (provider === "grok" && process.env.GROK_API_KEY) {
+    // 2. Real Groq API Call if GROQ_API_KEY is available
+    if (provider === "groq" && process.env.GROQ_API_KEY) {
       try {
-        const grokRes = await fetch("https://api.x.ai/v1/chat/completions", {
+        const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${process.env.GROK_API_KEY}`,
+            Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
           },
           body: JSON.stringify({
-            model: "grok-beta",
+            model: "llama-3.3-70b-versatile",
             messages: [
               {
                 role: "system",
@@ -47,15 +47,15 @@ export class AIService {
           }),
         });
 
-        if (grokRes.ok) {
-          const data = await grokRes.json();
+        if (groqRes.ok) {
+          const data = await groqRes.json();
           const text = data.choices?.[0]?.message?.content || "";
           if (text) {
             const timestamp = new Date().toISOString();
             const response: AIAnalysisResponse = {
-              id: `ai-grok-${Date.now()}`,
-              provider: "grok",
-              modelName: "Grok 2 Cricket Engine",
+              id: `ai-groq-${Date.now()}`,
+              provider: "groq",
+              modelName: "Groq Llama 3.3 70B",
               prompt: req.prompt,
               content: text,
               structuredOutput: {
@@ -87,9 +87,11 @@ export class AIService {
 
             return response;
           }
+        } else {
+          console.warn("Groq API error response:", groqRes.status, await groqRes.text());
         }
-      } catch (grokErr) {
-        console.warn("Grok API call fallback to tactical analysis model:", grokErr);
+      } catch (groqErr) {
+        console.warn("Groq API call fallback to tactical analysis model:", groqErr);
       }
     }
 
@@ -100,7 +102,7 @@ export class AIService {
         ? "Gemini 1.5 Pro Cricket"
         : provider === "openai"
         ? "GPT-4o Sports Intelligence"
-        : "Grok 2 Cricket Engine";
+        : "Groq Llama 3.3 70B";
 
     const response: AIAnalysisResponse = {
       id: `ai-res-${Date.now()}`,

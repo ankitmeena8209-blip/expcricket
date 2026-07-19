@@ -12,9 +12,9 @@ export default function AdminSettingsPage() {
         <div className="space-y-2">
           <label className="text-xs font-mono-data text-outline block">Active Default AI Provider</label>
           <select className="w-full p-3 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none">
+            <option value="groq">Groq (Llama 3.3 70B)</option>
             <option value="gemini">Google Gemini 1.5 Pro</option>
             <option value="openai">OpenAI GPT-4o</option>
-            <option value="grok">xAI Grok 2</option>
           </select>
         </div>
 
