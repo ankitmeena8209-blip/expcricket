@@ -2,11 +2,18 @@ import { Match } from "@/types/match";
 import { MOCK_MATCHES } from "@/lib/mockData/matches";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
+function withTimeout<T>(promise: PromiseLike<T>, ms: number = 3000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Supabase query timeout")), ms)),
+  ]);
+}
+
 export class MatchService {
   static async getAllMatches(): Promise<Match[]> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase.from("matches").select("*");
+        const { data, error } = await withTimeout(supabase.from("matches").select("*"));
         if (data && !error && data.length > 0) {
           return data.map((item) => ({
             id: item.id,
@@ -34,7 +41,7 @@ export class MatchService {
   static async getMatchById(id: string): Promise<Match | null> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase.from("matches").select("*").eq("id", id).single();
+        const { data, error } = await withTimeout(supabase.from("matches").select("*").eq("id", id).single());
         if (data && !error) {
           return {
             id: data.id,

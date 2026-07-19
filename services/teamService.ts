@@ -2,11 +2,18 @@ import { Team } from "@/types/team";
 import { MOCK_TEAMS } from "@/lib/mockData/teams";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
+function withTimeout<T>(promise: PromiseLike<T>, ms: number = 3000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Supabase query timeout")), ms)),
+  ]);
+}
+
 export class TeamService {
   static async getAllTeams(): Promise<Team[]> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase.from("teams").select("*");
+        const { data, error } = await withTimeout(supabase.from("teams").select("*"));
         if (data && !error && data.length > 0) {
           return data.map((item) => ({
             id: item.id,
@@ -31,7 +38,7 @@ export class TeamService {
   static async getTeamById(id: string): Promise<Team | null> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase.from("teams").select("*").eq("id", id).single();
+        const { data, error } = await withTimeout(supabase.from("teams").select("*").eq("id", id).single());
         if (data && !error) {
           return {
             id: data.id,

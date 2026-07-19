@@ -2,11 +2,18 @@ import { Ground } from "@/types/ground";
 import { MOCK_GROUNDS } from "@/lib/mockData/grounds";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
+function withTimeout<T>(promise: PromiseLike<T>, ms: number = 3000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Supabase query timeout")), ms)),
+  ]);
+}
+
 export class GroundService {
   static async getAllGrounds(): Promise<Ground[]> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase.from("grounds").select("*");
+        const { data, error } = await withTimeout(supabase.from("grounds").select("*"));
         if (data && !error && data.length > 0) {
           return data.map((item) => ({
             id: item.id,
@@ -33,7 +40,7 @@ export class GroundService {
   static async getGroundById(id: string): Promise<Ground | null> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase.from("grounds").select("*").eq("id", id).single();
+        const { data, error } = await withTimeout(supabase.from("grounds").select("*").eq("id", id).single());
         if (data && !error) {
           return {
             id: data.id,

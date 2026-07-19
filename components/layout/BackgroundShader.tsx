@@ -29,10 +29,17 @@ export default function BackgroundShader() {
     window.addEventListener("resize", syncSize);
 
     const gl =
-      canvas.getContext("webgl") ||
+      canvas.getContext("webgl", { preserveDrawingBuffer: false, powerPreference: "low-power" }) ||
       (canvas.getContext("experimental-webgl") as WebGLRenderingContext | null);
 
     if (!gl) return;
+
+    let isContextLost = false;
+    const handleContextLost = (e: Event) => {
+      e.preventDefault();
+      isContextLost = true;
+    };
+    canvas.addEventListener("webglcontextlost", handleContextLost);
 
     const vs = `
       attribute vec2 a_position;
@@ -45,11 +52,9 @@ export default function BackgroundShader() {
 
     const fs = `
       precision highp float;
-
       uniform float u_time;
       uniform vec2 u_resolution;
       uniform vec2 u_mouse;
-
       varying vec2 v_texCoord;
 
       void main() {
@@ -130,14 +135,21 @@ export default function BackgroundShader() {
     window.addEventListener("mousemove", handleMouseMove);
 
     let animationFrameId: number;
+    let lastFrameTime = 0;
+    const targetFpsInterval = 1000 / 30; // Throttle to max 30 FPS for low CPU/GPU load
 
     function render(t: number) {
-      if (!gl || !canvas) return;
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      if (uTime) gl.uniform1f(uTime, t * 0.001);
-      if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
-      if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      if (isContextLost || !gl || !canvas) return;
+      const elapsed = t - lastFrameTime;
+
+      if (elapsed > targetFpsInterval) {
+        lastFrameTime = t - (elapsed % targetFpsInterval);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        if (uTime) gl.uniform1f(uTime, t * 0.001);
+        if (uRes) gl.uniform2f(uRes, canvas.width, canvas.height);
+        if (uMouse) gl.uniform2f(uMouse, mouse.x, mouse.y);
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+      }
       animationFrameId = requestAnimationFrame(render);
     }
 
@@ -146,7 +158,20 @@ export default function BackgroundShader() {
     return () => {
       window.removeEventListener("resize", syncSize);
       window.removeEventListener("mousemove", handleMouseMove);
+      canvas.removeEventListener("webglcontextlost", handleContextLost);
       cancelAnimationFrame(animationFrameId);
+
+      // Clean up WebGL resources to prevent GPU memory leaks
+      try {
+        if (gl) {
+          gl.deleteBuffer(buf);
+          gl.deleteProgram(prog);
+          gl.deleteShader(vertShader);
+          gl.deleteShader(fragShader);
+        }
+      } catch (err) {
+        console.warn("WebGL cleanup error:", err);
+      }
     };
   }, [mounted]);
 

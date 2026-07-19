@@ -2,11 +2,18 @@ import { Player } from "@/types/player";
 import { MOCK_PLAYERS } from "@/lib/mockData/players";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
+function withTimeout<T>(promise: PromiseLike<T>, ms: number = 3000): Promise<T> {
+  return Promise.race([
+    promise,
+    new Promise<T>((_, reject) => setTimeout(() => reject(new Error("Supabase query timeout")), ms)),
+  ]);
+}
+
 export class PlayerService {
   static async getAllPlayers(): Promise<Player[]> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase.from("players").select("*");
+        const { data, error } = await withTimeout(supabase.from("players").select("*"));
         if (data && !error && data.length > 0) {
           return data.map((item) => ({
             id: item.id,
@@ -38,7 +45,7 @@ export class PlayerService {
   static async getPlayerById(id: string): Promise<Player | null> {
     if (isSupabaseConfigured) {
       try {
-        const { data, error } = await supabase.from("players").select("*").eq("id", id).single();
+        const { data, error } = await withTimeout(supabase.from("players").select("*").eq("id", id).single());
         if (data && !error) {
           return {
             id: data.id,
@@ -85,7 +92,6 @@ export class PlayerService {
     return player || MOCK_PLAYERS[0];
   }
 
-  // CRUD Operations
   static async createPlayer(player: Partial<Player>): Promise<boolean> {
     if (!isSupabaseConfigured) return false;
     try {
