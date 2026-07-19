@@ -13,8 +13,12 @@ const nextConfig = {
       },
       {
         protocol: 'https',
-        hostname: 'fonts.googleapis.com',
-      }
+        hostname: 'flagcdn.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.supabase.co',
+      },
     ],
   },
 };
