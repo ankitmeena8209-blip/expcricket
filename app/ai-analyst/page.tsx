@@ -5,10 +5,9 @@ import { useAIAnalyst } from "@/hooks/useAIAnalyst";
 import { AI_PROMPT_PRESETS } from "@/lib/mockData/aiPrompts";
 import Button from "@/components/common/Button";
 import Badge from "@/components/common/Badge";
-import { AIProvider } from "@/types/ai";
 
 export default function AICricketAnalystPage() {
-  const { provider, setProvider, messages, loading, askAI } = useAIAnalyst();
+  const { messages, loading, askAI } = useAIAnalyst();
   const [inputPrompt, setInputPrompt] = useState("");
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -27,7 +26,7 @@ export default function AICricketAnalystPage() {
 
   return (
     <div className="space-y-6">
-      {/* Page Header & AI Provider Selector */}
+      {/* Page Header */}
       <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1">
@@ -35,165 +34,157 @@ export default function AICricketAnalystPage() {
             <h1 className="font-headline font-black text-2xl lg:text-3xl text-on-surface">
               EXP Intelligence AI Analyst
             </h1>
-            <Badge variant="tertiary">MULTI-PROVIDER ENGINE</Badge>
+            <Badge variant="tertiary">GROQ LLAMA 3.3 ENGINE</Badge>
           </div>
           <p className="text-xs font-mono-data text-outline">
-            Configurable provider strategy: Gemini, OpenAI, Groq with response caching layer
+            Powered exclusively by Groq Llama 3.3 70B with sub-second cricket telemetry inference
           </p>
         </div>
 
-        {/* AI Provider Switcher */}
-        <div className="flex items-center gap-2 p-1.5 bg-surface-container-high border border-outline-variant/30 rounded-xl">
-          <span className="text-xs font-mono-data text-outline pl-2 hidden sm:inline">Active Model:</span>
-          {(["groq", "gemini", "openai"] as AIProvider[]).map((p) => (
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-container-high border border-outline-variant/30 rounded-xl text-xs font-mono-data text-primary">
+          <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+          <span>Groq Llama 3.3 70B Active</span>
+        </div>
+      </div>
+
+      {/* Preset Strategy Prompts */}
+      <div className="space-y-2">
+        <span className="text-xs font-mono-data text-outline block">SUGGESTED ANALYTICS PROMPTS</span>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {AI_PROMPT_PRESETS.map((preset) => (
             <button
-              key={p}
-              onClick={() => setProvider(p)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono-data font-bold uppercase transition-all ${
-                provider === p
-                  ? "bg-tertiary text-on-tertiary-fixed shadow-sm"
-                  : "text-outline hover:text-on-surface"
-              }`}
+              key={preset.id}
+              onClick={() => handlePresetClick(preset.prompt)}
+              disabled={loading}
+              className="p-3.5 rounded-2xl bg-surface-container-low border border-outline-variant/30 hover:border-primary/50 text-left transition-all group disabled:opacity-50"
             >
-              {p}
+              <div className="flex items-center justify-between mb-1">
+                <span className="text-[10px] font-mono-data text-tertiary font-bold">{preset.category}</span>
+                <span className="material-symbols-outlined text-outline group-hover:text-primary text-base transition-colors">
+                  arrow_forward
+                </span>
+              </div>
+              <p className="text-xs font-headline font-bold text-on-surface line-clamp-1">{preset.title}</p>
+              <p className="text-[11px] font-mono-data text-outline line-clamp-2 mt-0.5">{preset.prompt}</p>
             </button>
           ))}
         </div>
       </div>
 
-      {/* Main Layout Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
-        {/* Left Col: Preset Prompts Sidebar */}
-        <div className="lg:col-span-1 space-y-3">
-          <h3 className="text-xs font-mono-data font-bold text-on-surface uppercase tracking-wider flex items-center gap-1.5">
-            <span className="material-symbols-outlined text-tertiary text-sm">lightbulb</span>
-            PRESET TACTICAL QUERIES
-          </h3>
-          <div className="space-y-2">
-            {AI_PROMPT_PRESETS.map((preset) => (
-              <button
-                key={preset.id}
-                onClick={() => handlePresetClick(preset.prompt)}
-                disabled={loading}
-                className="w-full text-left p-3.5 rounded-2xl bg-surface-container-low border border-outline-variant/30 hover:border-tertiary/50 transition-all group"
-              >
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono-data font-bold text-tertiary uppercase">
-                    {preset.category}
-                  </span>
-                  <span className="material-symbols-outlined text-outline group-hover:text-tertiary text-sm">
-                    {preset.icon}
-                  </span>
-                </div>
-                <h4 className="text-xs font-bold text-on-surface group-hover:text-tertiary transition-colors">
-                  {preset.title}
-                </h4>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Col: Chat Container & Conversation */}
-        <div className="lg:col-span-3 space-y-4">
-          <div className="min-h-[420px] p-6 rounded-3xl bg-surface-container-lowest border border-outline-variant/30 flex flex-col justify-between space-y-6">
-            {/* Conversation Messages */}
-            {messages.length === 0 ? (
-              <div className="my-auto py-12 text-center space-y-3">
-                <div className="w-16 h-16 rounded-full bg-tertiary/10 border border-tertiary/30 flex items-center justify-center text-tertiary mx-auto">
-                  <span className="material-symbols-outlined text-3xl">psychology</span>
-                </div>
-                <h3 className="font-headline font-bold text-lg text-on-surface">
-                  Ready to analyze match telemetry.
-                </h3>
-                <p className="text-xs font-mono-data text-outline max-w-md mx-auto">
-                  Select a preset query from the left sidebar or type your custom prompt below to run predictive models.
-                </p>
+      {/* Main Conversation Thread */}
+      <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/30 space-y-6 min-h-[400px] flex flex-col justify-between">
+        <div className="space-y-6">
+          {messages.length === 0 ? (
+            <div className="text-center py-16 space-y-3">
+              <div className="w-14 h-14 rounded-full bg-tertiary/10 border border-tertiary/30 text-tertiary flex items-center justify-center mx-auto">
+                <span className="material-symbols-outlined text-3xl">smart_toy</span>
               </div>
-            ) : (
-              <div className="space-y-6">
-                {messages.map((msg) => (
-                  <div key={msg.id} className="space-y-4">
-                    {/* User Prompt Bubble */}
-                    <div className="flex justify-end">
-                      <div className="max-w-xl p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30 text-xs font-mono-data text-on-surface">
-                        <span className="text-[10px] text-outline block mb-1">YOUR QUERY</span>
-                        {msg.prompt}
-                      </div>
+              <h3 className="font-headline font-bold text-lg text-on-surface">
+                Groq AI Cricket Intelligence Engine Ready
+              </h3>
+              <p className="text-xs font-mono-data text-outline max-w-md mx-auto">
+                Ask any query regarding player seam matchups, pitch telemetry forecasts, win probability models, or fantasy strategy.
+              </p>
+            </div>
+          ) : (
+            messages.map((msg) => (
+              <div key={msg.id} className="space-y-4">
+                {/* User Prompt Bubble */}
+                <div className="flex justify-end">
+                  <div className="max-w-xl p-4 rounded-2xl bg-primary-container/20 border border-primary/40 text-xs font-mono-data text-on-surface">
+                    <span className="text-[10px] text-primary block font-bold mb-1">ANALYST QUERY</span>
+                    {msg.prompt}
+                  </div>
+                </div>
+
+                {/* AI Response Card */}
+                <div className="p-5 rounded-2xl bg-surface-container-high border border-outline-variant/30 space-y-4">
+                  <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
+                    <div className="flex items-center gap-2">
+                      <span className="w-2.5 h-2.5 rounded-full bg-tertiary" />
+                      <span className="text-xs font-mono-data font-bold text-on-surface">
+                        {msg.modelName}
+                      </span>
+                      {msg.cached && (
+                        <span className="px-2 py-0.5 rounded bg-surface-container text-[10px] font-mono-data text-outline">
+                          CACHED TELEMETRY
+                        </span>
+                      )}
                     </div>
+                    <span className="text-[10px] font-mono-data text-outline">
+                      {new Date(msg.timestamp).toLocaleTimeString()}
+                    </span>
+                  </div>
 
-                    {/* AI Response Card */}
-                    <div className="p-6 rounded-2xl bg-surface-container-low border border-tertiary/40 space-y-4">
-                      <div className="flex items-center justify-between border-b border-outline-variant/20 pb-3">
-                        <div className="flex items-center gap-2">
-                          <span className="material-symbols-outlined text-tertiary text-xl">psychology</span>
-                          <span className="font-headline font-bold text-sm text-on-surface">
-                            {msg.modelName}
+                  {/* Main Analysis Body */}
+                  <div className="text-xs font-mono-data text-on-surface-variant whitespace-pre-wrap leading-relaxed">
+                    {msg.content}
+                  </div>
+
+                  {/* Structured Telemetry Widgets */}
+                  {msg.structuredOutput && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-3 border-t border-outline-variant/20">
+                      {/* Win Probabilities */}
+                      {msg.structuredOutput.winProbability && (
+                        <div className="p-3 rounded-xl bg-surface-container border border-outline-variant/20 space-y-2">
+                          <span className="text-[10px] font-mono-data text-outline font-bold uppercase block">
+                            PROBABILISTIC WIN MODEL
                           </span>
+                          <div className="flex justify-between items-center text-xs font-mono-data font-bold">
+                            <span className="text-primary">Team A: {msg.structuredOutput.winProbability.teamA}%</span>
+                            <span className="text-secondary">Team B: {msg.structuredOutput.winProbability.teamB}%</span>
+                          </div>
+                          <div className="w-full h-2 rounded-full bg-surface-container-high overflow-hidden flex">
+                            <div className="h-full bg-primary" style={{ width: `${msg.structuredOutput.winProbability.teamA}%` }} />
+                            <div className="h-full bg-secondary" style={{ width: `${msg.structuredOutput.winProbability.teamB}%` }} />
+                          </div>
                         </div>
-                        <Badge variant={msg.cached ? "outline" : "tertiary"}>
-                          {msg.cached ? "AI CACHE HIT" : "REALTIME GENERATED"}
-                        </Badge>
-                      </div>
+                      )}
 
-                      {/* Main Text Content */}
-                      <p className="text-xs font-mono-data text-on-surface whitespace-pre-line leading-relaxed">
-                        {msg.content}
-                      </p>
-
-                      {/* Structured Output Grid */}
-                      {msg.structuredOutput && (
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2 border-t border-outline-variant/20">
-                          {/* Key Risks */}
-                          {msg.structuredOutput.keyRisks && (
-                            <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20">
-                              <span className="text-[10px] font-mono-data font-bold text-error uppercase block mb-1">
-                                ⚠️ RISK ANALYSIS
-                              </span>
-                              <ul className="text-[11px] font-mono-data text-on-surface-variant space-y-1 list-disc list-inside">
-                                {msg.structuredOutput.keyRisks.map((r, i) => (
-                                  <li key={i}>{r}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-
-                          {/* Tactical Recommendations */}
-                          {msg.structuredOutput.tacticalRecommendations && (
-                            <div className="p-3 rounded-xl bg-surface-container-high border border-outline-variant/20">
-                              <span className="text-[10px] font-mono-data font-bold text-primary uppercase block mb-1">
-                                🎯 TACTICAL RECOMMENDATIONS
-                              </span>
-                              <ul className="text-[11px] font-mono-data text-on-surface-variant space-y-1 list-disc list-inside">
-                                {msg.structuredOutput.tacticalRecommendations.map((t, i) => (
-                                  <li key={i}>{t}</li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
+                      {/* Tactical Recommendations */}
+                      {msg.structuredOutput.tacticalRecommendations && (
+                        <div className="p-3 rounded-xl bg-surface-container border border-outline-variant/20 space-y-1">
+                          <span className="text-[10px] font-mono-data text-tertiary font-bold uppercase block">
+                            TACTICAL RECOMMENDATIONS
+                          </span>
+                          <ul className="text-[11px] font-mono-data text-on-surface-variant space-y-1 list-disc list-inside">
+                            {msg.structuredOutput.tacticalRecommendations.map((rec, i) => (
+                              <li key={i}>{rec}</li>
+                            ))}
+                          </ul>
                         </div>
                       )}
                     </div>
-                  </div>
-                ))}
+                  )}
+                </div>
               </div>
-            )}
+            ))
+          )}
 
-            {/* Input Form */}
-            <form onSubmit={handleSubmit} className="pt-4 border-t border-outline-variant/20 flex gap-3">
-              <input
-                type="text"
-                placeholder="Ask AI Analyst (e.g. 'How to restrict Kohli in Powerplay?')..."
-                value={inputPrompt}
-                onChange={(e) => setInputPrompt(e.target.value)}
-                disabled={loading}
-                className="flex-1 px-4 py-3 bg-surface-container-low border border-outline-variant/40 rounded-2xl text-xs lg:text-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-tertiary focus:ring-1 focus:ring-tertiary transition-all"
-              />
-              <Button variant="primary" type="submit" disabled={loading} icon={loading ? "hourglass_empty" : "send"}>
-                {loading ? "Analyzing..." : "Ask AI"}
-              </Button>
-            </form>
-          </div>
+          {loading && (
+            <div className="p-4 rounded-2xl bg-surface-container-high border border-outline-variant/30 flex items-center gap-3 animate-pulse">
+              <span className="material-symbols-outlined text-tertiary animate-spin">refresh</span>
+              <span className="text-xs font-mono-data text-outline">
+                Groq Llama 3.3 70B inferring seam vectors & matchup telemetry...
+              </span>
+            </div>
+          )}
         </div>
+
+        {/* Input Form Bar */}
+        <form onSubmit={handleSubmit} className="pt-4 border-t border-outline-variant/20 flex gap-3">
+          <input
+            type="text"
+            placeholder="Ask Groq AI (e.g., Analyze Virat Kohli vs Left-Arm Pacers at MCG)..."
+            value={inputPrompt}
+            onChange={(e) => setInputPrompt(e.target.value)}
+            disabled={loading}
+            className="flex-1 px-4 py-3 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface placeholder:text-outline focus:outline-none focus:border-tertiary transition-all"
+          />
+          <Button variant="primary" type="submit" disabled={loading || !inputPrompt.trim()} icon="send">
+            Analyze
+          </Button>
+        </form>
       </div>
     </div>
   );

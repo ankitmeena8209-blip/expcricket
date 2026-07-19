@@ -10,12 +10,11 @@ export default function AdminSettingsPage() {
 
       <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/30 space-y-4 max-w-xl">
         <div className="space-y-2">
-          <label className="text-xs font-mono-data text-outline block">Active Default AI Provider</label>
-          <select className="w-full p-3 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-on-surface focus:outline-none">
-            <option value="groq">Groq (Llama 3.3 70B)</option>
-            <option value="gemini">Google Gemini 1.5 Pro</option>
-            <option value="openai">OpenAI GPT-4o</option>
-          </select>
+          <label className="text-xs font-mono-data text-outline block">Active Dedicated AI Engine</label>
+          <div className="p-3 bg-surface-container-high border border-outline-variant/40 rounded-xl text-xs font-mono-data text-primary font-bold flex items-center justify-between">
+            <span>Groq Llama 3.3 70B Engine</span>
+            <span className="text-[10px] text-outline uppercase font-semibold">ACTIVE</span>
+          </div>
         </div>
 
         <div className="space-y-2">

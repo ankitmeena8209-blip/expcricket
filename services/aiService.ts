@@ -5,16 +5,12 @@ const aiCacheStore: Map<string, AICacheEntry> = new Map();
 
 export class AIService {
   static getActiveProvider(): AIProvider {
-    if (process.env.GROQ_API_KEY) return "groq";
-    if (process.env.OPENAI_API_KEY) return "openai";
-    if (process.env.GEMINI_API_KEY) return "gemini";
-    const provider = process.env.DEFAULT_AI_PROVIDER as AIProvider;
-    return provider && ["gemini", "openai", "groq"].includes(provider) ? provider : "groq";
+    return "groq";
   }
 
   static async analyzeQuery(req: AIAnalysisRequest): Promise<AIAnalysisResponse> {
-    const provider = req.provider || this.getActiveProvider();
-    const cacheKey = `${provider}:${req.contextType || "GEN"}:${req.prompt.trim().toLowerCase()}`;
+    const provider: AIProvider = "groq";
+    const cacheKey = `groq:${req.contextType || "GEN"}:${req.prompt.trim().toLowerCase()}`;
 
     // 1. Check AI Cache
     if (aiCacheStore.has(cacheKey)) {
@@ -24,8 +20,8 @@ export class AIService {
       }
     }
 
-    // 2. Real Groq API Call if GROQ_API_KEY is available
-    if (provider === "groq" && process.env.GROQ_API_KEY) {
+    // 2. Real Groq API Call via Groq Llama 3.3 70B
+    if (process.env.GROQ_API_KEY) {
       try {
         const groqRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
           method: "POST",
@@ -95,21 +91,16 @@ export class AIService {
       }
     }
 
-    // 3. Fallback Tactical Response Generator
+    // 3. Groq Fallback Response Generator
     const timestamp = new Date().toISOString();
-    const modelName =
-      provider === "gemini"
-        ? "Gemini 1.5 Pro Cricket"
-        : provider === "openai"
-        ? "GPT-4o Sports Intelligence"
-        : "Groq Llama 3.3 70B";
+    const modelName = "Groq Llama 3.3 70B";
 
     const response: AIAnalysisResponse = {
       id: `ai-res-${Date.now()}`,
-      provider,
+      provider: "groq",
       modelName,
       prompt: req.prompt,
-      content: `[${modelName} Tactical Analysis]\n\nBased on predictive trajectory models and historical pitch telemetry for "${req.prompt}":\n\n1. Pitch Behavior & Seam Index: High seam movement expected in the opening 15 overs (1.8° average lateral deviation).\n2. Batter Matchup Dynamics: Vulnerability identified against full-length deliveries outside off-stump at 140+ km/h.\n3. Tactical Recommendation: Deploy a deep fine-leg and aggressive short-cover fielder to catch upper-edge top slices.`,
+      content: `[Groq Llama 3.3 70B Tactical Analysis]\n\nBased on predictive trajectory models and historical pitch telemetry for "${req.prompt}":\n\n1. Pitch Behavior & Seam Index: High seam movement expected in the opening 15 overs (1.8° average lateral deviation).\n2. Batter Matchup Dynamics: Vulnerability identified against full-length deliveries outside off-stump at 140+ km/h.\n3. Tactical Recommendation: Deploy a deep fine-leg and aggressive short-cover fielder to catch upper-edge top slices.`,
       structuredOutput: {
         summary: `Strategic forecast indicates a 62% win probability bias for team batting first under cloudy overhead conditions.`,
         winProbability: { teamA: 62, teamB: 38 },
