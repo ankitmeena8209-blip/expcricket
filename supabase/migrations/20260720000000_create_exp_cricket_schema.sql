@@ -1,7 +1,7 @@
 -- ==============================================================================
 -- EXP CRICKET (XPERT CRICKET) INSTITUTIONAL-GRADE DATABASE SCHEMA
 -- Migration: 20260720000000_create_exp_cricket_schema.sql
--- Compatible with Supabase PostgreSQL, RLS, Storage Buckets, and Auth Triggers
+-- Idempotent & Fully Compatible with Supabase PostgreSQL, RLS, Storage, & Auth
 -- ==============================================================================
 
 -- Enable required Extensions
@@ -192,7 +192,7 @@ CREATE INDEX IF NOT EXISTS idx_favorites_user ON public.user_favorites(user_id);
 CREATE INDEX IF NOT EXISTS idx_ai_cache_expires ON public.ai_cache_entries(expires_at);
 
 -- ==============================================================================
--- ROW LEVEL SECURITY (RLS) & POLICIES
+-- ROW LEVEL SECURITY (RLS) & IDEMPOTENT POLICIES
 -- ==============================================================================
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.teams ENABLE ROW LEVEL SECURITY;
@@ -205,45 +205,70 @@ ALTER TABLE public.ai_cache_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.system_logs ENABLE ROW LEVEL SECURITY;
 
 -- Public Read Policies (Allow everyone to view telemetry)
+DROP POLICY IF EXISTS "Public Read Profiles" ON public.profiles;
 CREATE POLICY "Public Read Profiles" ON public.profiles FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read Teams" ON public.teams;
 CREATE POLICY "Public Read Teams" ON public.teams FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read Players" ON public.players;
 CREATE POLICY "Public Read Players" ON public.players FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read Grounds" ON public.grounds;
 CREATE POLICY "Public Read Grounds" ON public.grounds FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read Matches" ON public.matches;
 CREATE POLICY "Public Read Matches" ON public.matches FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read Matchups" ON public.player_matchups;
 CREATE POLICY "Public Read Matchups" ON public.player_matchups FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Public Read AI Cache" ON public.ai_cache_entries;
 CREATE POLICY "Public Read AI Cache" ON public.ai_cache_entries FOR SELECT USING (true);
 
 -- User Specific Policies (Bookmarks & Personal Profile)
+DROP POLICY IF EXISTS "Users Manage Own Profile" ON public.profiles;
 CREATE POLICY "Users Manage Own Profile" ON public.profiles
     FOR UPDATE USING (auth.uid() = id);
 
+DROP POLICY IF EXISTS "Users Manage Own Favorites" ON public.user_favorites;
 CREATE POLICY "Users Manage Own Favorites" ON public.user_favorites
     FOR ALL USING (auth.uid() = user_id);
 
 -- Admin / Analyst Full Access Policies
+DROP POLICY IF EXISTS "Admin Modify Players" ON public.players;
 CREATE POLICY "Admin Modify Players" ON public.players
     FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SUPER_ADMIN', 'ANALYST')));
 
+DROP POLICY IF EXISTS "Admin Modify Grounds" ON public.grounds;
 CREATE POLICY "Admin Modify Grounds" ON public.grounds
     FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SUPER_ADMIN', 'ANALYST')));
 
+DROP POLICY IF EXISTS "Admin Modify Matches" ON public.matches;
 CREATE POLICY "Admin Modify Matches" ON public.matches
     FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SUPER_ADMIN', 'ANALYST')));
 
+DROP POLICY IF EXISTS "Admin Insert Logs" ON public.system_logs;
 CREATE POLICY "Admin Insert Logs" ON public.system_logs
     FOR INSERT WITH CHECK (true);
 
+DROP POLICY IF EXISTS "Admin View Logs" ON public.system_logs;
 CREATE POLICY "Admin View Logs" ON public.system_logs
     FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SUPER_ADMIN', 'ANALYST')));
 
 -- ==============================================================================
--- STORAGE BUCKETS (Player Avatars, Flags, Stadium Photos)
+-- STORAGE BUCKETS & IDEMPOTENT STORAGE POLICIES
 -- ==============================================================================
 INSERT INTO storage.buckets (id, name, public) VALUES ('player-avatars', 'player-avatars', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO storage.buckets (id, name, public) VALUES ('country-flags', 'country-flags', true) ON CONFLICT (id) DO NOTHING;
 INSERT INTO storage.buckets (id, name, public) VALUES ('ground-images', 'ground-images', true) ON CONFLICT (id) DO NOTHING;
 
--- Public Read Access for Storage Buckets
+-- Safely create Public Read Access for Storage Buckets
+DROP POLICY IF EXISTS "Public Storage Read Avatars" ON storage.objects;
 CREATE POLICY "Public Storage Read Avatars" ON storage.objects FOR SELECT USING (bucket_id = 'player-avatars');
+
+DROP POLICY IF EXISTS "Public Storage Read Flags" ON storage.objects;
 CREATE POLICY "Public Storage Read Flags" ON storage.objects FOR SELECT USING (bucket_id = 'country-flags');
+
+DROP POLICY IF EXISTS "Public Storage Read Grounds" ON storage.objects;
 CREATE POLICY "Public Storage Read Grounds" ON storage.objects FOR SELECT USING (bucket_id = 'ground-images');
