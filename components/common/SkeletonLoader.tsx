@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 
 export default function SkeletonLoader({ className = "h-20 w-full" }: { className?: string }) {

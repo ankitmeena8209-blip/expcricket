@@ -1,11 +1,17 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 export default function BackgroundShader() {
+  const [mounted, setMounted] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -50,22 +56,19 @@ export default function BackgroundShader() {
           vec2 uv = v_texCoord;
           vec2 mouse = u_mouse / u_resolution;
           
-          // Deep, elegant dark background with subtle motion
           float noise = sin(uv.x * 10.0 + u_time * 0.5) * cos(uv.y * 10.0 + u_time * 0.5);
           noise += sin(uv.x * 20.0 - u_time * 0.2) * 0.5;
           
-          vec3 color1 = vec3(0.066, 0.075, 0.090); // Surface-dim: #111317
-          vec3 color2 = vec3(0.102, 0.110, 0.125); // Surface: #1a1c20
-          vec3 accent = vec3(0.133, 0.772, 0.369); // #22c55e (Performance Green)
+          vec3 color1 = vec3(0.066, 0.075, 0.090);
+          vec3 color2 = vec3(0.102, 0.110, 0.125);
+          vec3 accent = vec3(0.133, 0.772, 0.369);
           
           float gradient = smoothstep(0.0, 1.0, uv.y + noise * 0.1);
           vec3 finalColor = mix(color1, color2, gradient);
           
-          // Subtle interactive mouse highlight
           float dist = length(uv - mouse);
           finalColor += accent * (1.0 - smoothstep(0.0, 0.6, dist)) * 0.04;
           
-          // Vignette effect
           float vignette = 1.0 - length(uv - 0.5) * 0.5;
           finalColor *= vignette;
 
@@ -145,7 +148,11 @@ export default function BackgroundShader() {
       window.removeEventListener("mousemove", handleMouseMove);
       cancelAnimationFrame(animationFrameId);
     };
-  }, []);
+  }, [mounted]);
+
+  if (!mounted) {
+    return <div className="fixed inset-0 w-full h-full bg-[#111317] -z-10" />;
+  }
 
   return (
     <div className="fixed inset-0 w-full h-full pointer-events-none -z-10 overflow-hidden">
