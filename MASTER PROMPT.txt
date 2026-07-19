@@ -1,0 +1,1267 @@
+# EXP Cricket (Xpert Cricket)
+## MASTER DEVELOPMENT SPECIFICATION
+### VERSION 1.0
+
+You are an elite software architect, senior full-stack engineer, product designer, UI engineer, backend architect, frontend architect, security engineer and UX expert.
+
+Your task is to convert the uploaded EXP Cricket design into a complete production-quality web application.
+
+The uploaded design is FINAL.
+
+Treat it as the only source of truth.
+
+Never redesign the UI.
+
+Never simplify layouts.
+
+Never replace components.
+
+Never generate alternative pages.
+
+Never duplicate screens.
+
+Never change branding.
+
+Never create V2 pages.
+
+Never modify navigation hierarchy.
+
+Implement the uploaded design pixel-perfect while writing scalable production-ready code.
+
+--------------------------------------------------
+
+# PROJECT NAME
+
+EXP Cricket
+
+Full Name
+
+Xpert Cricket
+
+Never use:
+
+Stitch
+
+Stitch Pro
+
+Template
+
+Demo
+
+Sample
+
+Placeholder Branding
+
+Generic Dashboard
+
+Use EXP Cricket branding everywhere.
+
+--------------------------------------------------
+
+# IMPORTANT
+
+Do NOT initialize Git.
+
+Do NOT create any GitHub repository.
+
+Do NOT connect to an existing repository.
+
+Do NOT publish code.
+
+Do NOT deploy.
+
+Generate the complete project locally only.
+
+--------------------------------------------------
+
+# PRIMARY GOAL
+
+Generate a production-quality frontend which is fully prepared for backend integration.
+
+Backend must NOT be implemented.
+
+Instead prepare a backend-ready architecture.
+
+Everything should be modular.
+
+Everything should be scalable.
+
+Everything should be secure.
+
+Everything should be reusable.
+
+--------------------------------------------------
+
+# TECHNOLOGY STACK
+
+Use
+
+Next.js (Latest App Router)
+
+TypeScript
+
+React
+
+Tailwind CSS
+
+ESLint
+
+Prettier
+
+Use latest stable versions.
+
+Never use deprecated APIs.
+
+--------------------------------------------------
+
+# CODE QUALITY
+
+Write production-quality code.
+
+No shortcuts.
+
+No duplicated logic.
+
+No duplicated components.
+
+No unnecessary libraries.
+
+Readable code.
+
+Professional folder structure.
+
+Professional naming conventions.
+
+Strict TypeScript.
+
+Reusable architecture.
+
+Reusable UI.
+
+Reusable Services.
+
+Reusable Hooks.
+
+Reusable Utilities.
+
+Reusable Types.
+
+--------------------------------------------------
+
+# PIXEL PERFECT IMPLEMENTATION
+
+The uploaded design is FINAL.
+
+Implement every screen exactly.
+
+Do NOT redesign.
+
+Do NOT improve visually.
+
+Do NOT simplify.
+
+Do NOT replace layouts.
+
+Follow:
+
+Spacing
+
+Typography
+
+Cards
+
+Tables
+
+Buttons
+
+Icons
+
+Charts
+
+Navigation
+
+Sidebar
+
+Header
+
+Footer
+
+Forms
+
+Dialogs
+
+Modals
+
+Animations
+
+Responsive layouts
+
+Everything should visually match the uploaded design.
+
+--------------------------------------------------
+
+# RESPONSIVE
+
+Website must work perfectly on
+
+Mobile
+
+Tablet
+
+Laptop
+
+Desktop
+
+No overlap.
+
+No broken grids.
+
+No overflow.
+
+No horizontal scrolling.
+
+Touch-friendly controls.
+
+Desktop should intelligently use available screen space.
+
+--------------------------------------------------
+
+# ANIMATIONS
+
+Implement premium animations.
+
+Smooth page transitions.
+
+Micro interactions.
+
+Button hover.
+
+Card hover.
+
+Loading skeletons.
+
+Animated counters.
+
+Chart transitions.
+
+Smooth scrolling.
+
+Sticky navigation.
+
+Search animations.
+
+Elegant modals.
+
+Tab transitions.
+
+Nothing should feel cheap.
+
+Nothing should feel excessive.
+
+Everything should feel premium.
+
+--------------------------------------------------
+
+# FRONTEND ARCHITECTURE
+
+UI must never directly communicate with database.
+
+UI must never directly communicate with Supabase.
+
+UI must never directly communicate with AI providers.
+
+Everything should go through service layers.
+
+Use clean architecture.
+
+UI
+
+↓
+
+Hooks
+
+↓
+
+Services
+
+↓
+
+API Layer
+
+↓
+
+Future Backend
+
+Every layer must remain independent.
+
+--------------------------------------------------
+
+# FOLDER STRUCTURE
+
+Create a clean scalable structure.
+
+app/
+
+components/
+
+features/
+
+hooks/
+
+lib/
+
+services/
+
+types/
+
+utils/
+
+styles/
+
+public/
+
+middleware.ts
+
+constants/
+
+config/
+
+providers/
+
+contexts/
+
+assets/
+
+Every folder should have a clear responsibility.
+
+--------------------------------------------------
+
+# COMPONENT DESIGN
+
+Every component must be reusable.
+
+Never duplicate code.
+
+Create reusable
+
+Buttons
+
+Cards
+
+Inputs
+
+Dialogs
+
+Tables
+
+Charts
+
+Filters
+
+Badges
+
+Search
+
+Navigation
+
+Pagination
+
+Dropdowns
+
+Accordions
+
+Tabs
+
+Stat Cards
+
+Player Cards
+
+Ground Cards
+
+Comparison Cards
+
+Loading Components
+
+Error Components
+
+Empty State Components
+
+Offline Components
+
+Everything must be reusable.
+
+--------------------------------------------------
+
+# MOCK DATA
+
+Until backend is connected
+
+Use realistic cricket mock data.
+
+Never leave blank UI.
+
+Never display Lorem Ipsum.
+
+Every screen should appear completely functional.
+
+Mock data should remain isolated.
+
+It must be replaceable later without changing UI components.
+
+--------------------------------------------------
+
+# SERVICE LAYER
+
+Every screen must receive data through services.
+
+Never fetch directly inside components.
+
+Never couple frontend with backend.
+
+When Supabase is added later
+
+Only services should require modification.
+
+UI should remain untouched.
+
+--------------------------------------------------
+
+# CONFIGURATION
+
+Centralize project configuration.
+
+Theme
+
+Brand Name
+
+Colors
+
+Navigation
+
+Routes
+
+AI Provider
+
+API URLs
+
+Future endpoints
+
+Everything configurable from one place.
+
+--------------------------------------------------
+
+# BACKEND READY ARCHITECTURE
+
+Do NOT build the backend.
+
+Instead prepare a professional backend-ready architecture.
+
+The project must be ready for future backend integration without major refactoring.
+
+The frontend must work independently using mock data until the backend is connected.
+
+Never tightly couple UI with backend implementation.
+
+--------------------------------------------------
+
+# SUPABASE READY
+
+Prepare the project so Supabase can be connected later with minimal code changes.
+
+Prepare architecture for:
+
+Authentication
+
+Database
+
+Storage
+
+Row Level Security (RLS)
+
+Realtime
+
+Future Edge Functions
+
+Do NOT configure Supabase.
+
+Do NOT populate any database.
+
+Do NOT require a Supabase project to run the frontend.
+
+--------------------------------------------------
+
+# DATABASE MODELS
+
+Prepare TypeScript interfaces and model definitions for future database tables.
+
+Include:
+
+Players
+
+Teams
+
+Grounds
+
+Matches
+
+Series
+
+Rankings
+
+Batting Stats
+
+Bowling Stats
+
+Fielding Stats
+
+Venue Stats
+
+Player vs Bowler
+
+Player vs Ground
+
+Head-to-Head
+
+Users
+
+Admins
+
+Favorites
+
+Recent Searches
+
+Notifications
+
+Settings
+
+AI Cache
+
+Saved Reports
+
+Fantasy Lists
+
+All models must remain modular and reusable.
+
+--------------------------------------------------
+
+# API ARCHITECTURE
+
+Prepare future API routes.
+
+Examples:
+
+/api/players
+
+/api/player
+
+/api/grounds
+
+/api/matches
+
+/api/rankings
+
+/api/search
+
+/api/compare
+
+/api/fantasy
+
+/api/ai
+
+/api/admin
+
+/api/auth
+
+/api/settings
+
+Do not implement backend logic.
+
+Only prepare scalable architecture.
+
+--------------------------------------------------
+
+# AI ARCHITECTURE
+
+Prepare an AI Provider Manager.
+
+Supported Providers:
+
+Gemini
+
+OpenAI
+
+Grok (xAI)
+
+The active provider must be configurable from one central configuration file.
+
+Switching providers must never require UI modifications.
+
+Prepare a common interface so every provider returns the same response format.
+
+Never expose provider keys to the frontend.
+
+--------------------------------------------------
+
+# AI CACHE
+
+Prepare architecture for future AI caching.
+
+Flow:
+
+User Request
+
+↓
+
+Check AI Cache
+
+↓
+
+If Cached
+
+Return Cached Result
+
+↓
+
+Else
+
+Call Selected AI Provider
+
+↓
+
+Store Response
+
+↓
+
+Return Response
+
+Prepare the architecture only.
+
+--------------------------------------------------
+
+# ENVIRONMENT VARIABLES
+
+Create:
+
+.env.local
+
+.env.example
+
+Populate ONLY with placeholder values.
+
+Example:
+
+ADMIN_USERNAME=example_admin_username
+
+ADMIN_PASSWORD=example_admin_password
+
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+
+OPENAI_API_KEY=your_openai_api_key
+
+GEMINI_API_KEY=your_gemini_api_key
+
+XAI_API_KEY=your_xai_api_key
+
+NEXT_PUBLIC_APP_NAME=EXP Cricket
+
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+Never include real secrets.
+
+Always access variables using process.env.
+
+If any variable is missing, show a clear developer-friendly message.
+
+Never crash silently.
+
+--------------------------------------------------
+
+# GITIGNORE
+
+Generate a proper .gitignore.
+
+Ensure sensitive files are ignored.
+
+Include:
+
+.env.local
+
+.env
+
+.next
+
+node_modules
+
+coverage
+
+build
+
+dist
+
+Never commit secrets.
+
+--------------------------------------------------
+
+# SECURITY
+
+Never expose:
+
+Admin Username
+
+Admin Password
+
+AI Keys
+
+Supabase Service Role Key
+
+Sensitive tokens
+
+Everything sensitive must remain server-side.
+
+Never hardcode credentials.
+
+Never expose secrets to browser.
+
+--------------------------------------------------
+
+# ADMIN PANEL
+
+Prepare a production-ready Admin Dashboard.
+
+Include pages for:
+
+Dashboard
+
+Players
+
+Teams
+
+Grounds
+
+Matches
+
+Rankings
+
+Users
+
+Reports
+
+AI Cache
+
+Analytics
+
+Settings
+
+System Logs
+
+Prepare CRUD-ready architecture only.
+
+No database implementation.
+
+--------------------------------------------------
+
+# AUTHENTICATION
+
+Prepare secure authentication architecture.
+
+Login
+
+Logout
+
+Forgot Password
+
+Protected Routes
+
+Role-based Access
+
+Session Management
+
+Unauthorized Page
+
+Forbidden Page
+
+Architecture only.
+
+--------------------------------------------------
+
+# CRICKET DATA IMPORT
+
+Design the project so future cricket data can be imported from:
+
+CSV
+
+JSON
+
+External Cricket APIs
+
+Manual Admin Entry
+
+The frontend must never require changes after backend integration.
+
+--------------------------------------------------
+
+# SEARCH SYSTEM
+
+Prepare architecture for:
+
+Global Search
+
+Player Search
+
+Ground Search
+
+Instant Suggestions
+
+Recent Searches
+
+Trending Searches
+
+Search History
+
+Everything must support future backend integration.
+
+--------------------------------------------------
+
+# ANALYTICS
+
+Prepare reusable analytics architecture.
+
+Charts
+
+Graphs
+
+Radar Charts
+
+Comparison Charts
+
+Performance Rings
+
+Venue Charts
+
+Timeline Charts
+
+Every chart must support:
+
+Dynamic Data
+
+Loading State
+
+Empty State
+
+Responsive Resize
+
+Future Live Updates
+
+--------------------------------------------------
+
+# DOCUMENTATION
+
+Generate a professional README.md
+
+Include:
+
+Project Overview
+
+Folder Structure
+
+Installation
+
+Run Locally
+
+Environment Variables
+
+Future Supabase Setup
+
+Future AI Setup
+
+Project Architecture
+
+Developer Notes
+
+--------------------------------------------------
+
+# USER EXPERIENCE
+
+The application must feel like a premium commercial product.
+
+Fast.
+
+Modern.
+
+Professional.
+
+Elegant.
+
+Smooth.
+
+Every interaction should feel polished.
+
+Avoid clutter.
+
+Prioritize usability over visual complexity.
+
+--------------------------------------------------
+
+# PAGES
+
+Implement all approved pages from the uploaded design.
+
+Do not remove any page.
+
+Do not merge pages.
+
+Do not create duplicate pages.
+
+Maintain navigation exactly as designed.
+
+Include architecture for:
+
+Home
+
+Player Analysis
+
+Ground Analysis
+
+Player Comparison
+
+Team Analysis
+
+Rankings
+
+Match Analysis
+
+AI Cricket Analyst
+
+Search
+
+Favorites
+
+Recent Searches
+
+About
+
+Contact
+
+FAQ
+
+Privacy Policy
+
+Terms & Conditions
+
+Disclaimer
+
+404
+
+500
+
+Offline
+
+Admin Dashboard
+
+Every page must follow the same design language.
+
+--------------------------------------------------
+
+# PLAYER ANALYSIS
+
+Prepare UI and architecture to support future analysis for:
+
+Batters
+
+Bowlers
+
+All-rounders
+
+Wicketkeepers
+
+Left/Right-hand combinations
+
+Future data should support:
+
+Career stats
+
+Recent form
+
+Home vs Away
+
+Venue performance
+
+Opponent performance
+
+Batting vs Pace
+
+Batting vs Spin
+
+Bowling vs Left-hand batters
+
+Bowling vs Right-hand batters
+
+Phase-wise performance
+
+Powerplay
+
+Middle Overs
+
+Death Overs
+
+Strike Rate
+
+Average
+
+Economy
+
+Boundary %
+
+Dot Ball %
+
+Dismissal Types
+
+Wagon Wheel
+
+Pitch Map
+
+Heat Map
+
+Trend Charts
+
+Prepare UI only.
+
+--------------------------------------------------
+
+# GROUND ANALYSIS
+
+Prepare UI for:
+
+Venue Overview
+
+Pitch Type
+
+Average Score
+
+Winning Pattern
+
+Pace vs Spin
+
+Day vs Night
+
+First Innings
+
+Second Innings
+
+Historical Records
+
+Weather Placeholder
+
+Boundary Dimensions Placeholder
+
+Future API-ready structure.
+
+--------------------------------------------------
+
+# COMPARISON
+
+Prepare comparison UI for:
+
+Player vs Player
+
+Bowler vs Batter
+
+Ground vs Ground
+
+Team vs Team
+
+Season Comparison
+
+Career Comparison
+
+Visual comparison using reusable chart components.
+
+--------------------------------------------------
+
+# DESIGN SYSTEM
+
+Maintain a consistent design system.
+
+Reusable typography.
+
+Reusable spacing.
+
+Reusable color tokens.
+
+Reusable shadows.
+
+Reusable border radius.
+
+Reusable icons.
+
+Reusable buttons.
+
+No inconsistent styling.
+
+--------------------------------------------------
+
+# BRAND IDENTITY
+
+Maintain EXP Cricket branding everywhere.
+
+Professional sports analytics appearance.
+
+Modern.
+
+Minimal.
+
+Premium.
+
+Do not use generic AI gradients.
+
+Create a unique visual identity.
+
+Player cards should automatically adapt accent colors based on the player's national team colors (using a configurable theme mapping, not hardcoded page-by-page).
+
+--------------------------------------------------
+
+# PERFORMANCE
+
+Optimize everything.
+
+Fast initial load.
+
+Lazy loading.
+
+Dynamic imports.
+
+Optimized images.
+
+Optimized fonts.
+
+Minimal bundle size.
+
+Avoid unnecessary re-renders.
+
+--------------------------------------------------
+
+# ACCESSIBILITY
+
+Use semantic HTML.
+
+Keyboard navigation.
+
+ARIA labels where appropriate.
+
+Accessible forms.
+
+Visible focus states.
+
+Readable contrast.
+
+--------------------------------------------------
+
+# SEO
+
+Prepare:
+
+Metadata
+
+Open Graph
+
+Twitter Cards
+
+Canonical URLs
+
+Dynamic titles
+
+Structured data
+
+Human-friendly URLs
+
+Clean metadata architecture.
+
+--------------------------------------------------
+
+# ERROR HANDLING
+
+Create reusable components for:
+
+Loading
+
+Skeleton
+
+Error
+
+Retry
+
+Empty State
+
+Offline
+
+404
+
+500
+
+Graceful failure.
+
+Never use browser alert() for application errors.
+
+--------------------------------------------------
+
+# TESTING PREPARATION
+
+Structure the project so it is easy to add unit, integration and end-to-end tests later.
+
+Keep business logic separated from UI.
+
+--------------------------------------------------
+
+# FUTURE SCALABILITY
+
+The architecture must support future features without major refactoring, including:
+
+Supabase integration
+
+Authentication
+
+Realtime updates
+
+Fantasy tools
+
+AI analysis
+
+Notifications
+
+Bookmarks
+
+Reports
+
+Premium features
+
+--------------------------------------------------
+
+# FINAL ACCEPTANCE CRITERIA
+
+The generated project must:
+
+- Match the uploaded design pixel-perfect.
+- Be production-quality.
+- Be fully responsive.
+- Be modular.
+- Be secure.
+- Be backend-ready.
+- Be Supabase-ready.
+- Be AI-ready.
+- Never expose secrets.
+- Use `.env.local` and `.env.example`.
+- Include a proper `.gitignore`.
+- Keep frontend decoupled from backend.
+- Use reusable components throughout.
+- Use reusable services and TypeScript types.
+- Be easy to maintain and scale.
+- Avoid placeholder branding.
+- Use "EXP Cricket (Xpert Cricket)" consistently.
+- Be ready for future cricket data integration without restructuring the application.
+
+If any instruction conflicts with another, this MASTER DEVELOPMENT SPECIFICATION takes priority.
+
