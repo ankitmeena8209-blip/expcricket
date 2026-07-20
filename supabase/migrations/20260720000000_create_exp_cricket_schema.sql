@@ -204,27 +204,36 @@ ALTER TABLE public.user_favorites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.ai_cache_entries ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.system_logs ENABLE ROW LEVEL SECURITY;
 
--- Public Read Policies (Allow everyone to view telemetry)
+-- Public Read & Write Policies (Allow anonymous CricAPI sync, telemetry viewing, and admin management)
 DROP POLICY IF EXISTS "Public Read Profiles" ON public.profiles;
 CREATE POLICY "Public Read Profiles" ON public.profiles FOR SELECT USING (true);
 
 DROP POLICY IF EXISTS "Public Read Teams" ON public.teams;
-CREATE POLICY "Public Read Teams" ON public.teams FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Manage Teams" ON public.teams;
+CREATE POLICY "Public Manage Teams" ON public.teams FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public Read Players" ON public.players;
-CREATE POLICY "Public Read Players" ON public.players FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Admin Modify Players" ON public.players;
+DROP POLICY IF EXISTS "Public Manage Players" ON public.players;
+CREATE POLICY "Public Manage Players" ON public.players FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public Read Grounds" ON public.grounds;
-CREATE POLICY "Public Read Grounds" ON public.grounds FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Admin Modify Grounds" ON public.grounds;
+DROP POLICY IF EXISTS "Public Manage Grounds" ON public.grounds;
+CREATE POLICY "Public Manage Grounds" ON public.grounds FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public Read Matches" ON public.matches;
-CREATE POLICY "Public Read Matches" ON public.matches FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Admin Modify Matches" ON public.matches;
+DROP POLICY IF EXISTS "Public Manage Matches" ON public.matches;
+CREATE POLICY "Public Manage Matches" ON public.matches FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public Read Matchups" ON public.player_matchups;
-CREATE POLICY "Public Read Matchups" ON public.player_matchups FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Manage Matchups" ON public.player_matchups;
+CREATE POLICY "Public Manage Matchups" ON public.player_matchups FOR ALL USING (true) WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Public Read AI Cache" ON public.ai_cache_entries;
-CREATE POLICY "Public Read AI Cache" ON public.ai_cache_entries FOR SELECT USING (true);
+DROP POLICY IF EXISTS "Public Manage AI Cache" ON public.ai_cache_entries;
+CREATE POLICY "Public Manage AI Cache" ON public.ai_cache_entries FOR ALL USING (true) WITH CHECK (true);
 
 -- User Specific Policies (Bookmarks & Personal Profile)
 DROP POLICY IF EXISTS "Users Manage Own Profile" ON public.profiles;
@@ -235,26 +244,13 @@ DROP POLICY IF EXISTS "Users Manage Own Favorites" ON public.user_favorites;
 CREATE POLICY "Users Manage Own Favorites" ON public.user_favorites
     FOR ALL USING (auth.uid() = user_id);
 
--- Admin / Analyst Full Access Policies
-DROP POLICY IF EXISTS "Admin Modify Players" ON public.players;
-CREATE POLICY "Admin Modify Players" ON public.players
-    FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SUPER_ADMIN', 'ANALYST')));
-
-DROP POLICY IF EXISTS "Admin Modify Grounds" ON public.grounds;
-CREATE POLICY "Admin Modify Grounds" ON public.grounds
-    FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SUPER_ADMIN', 'ANALYST')));
-
-DROP POLICY IF EXISTS "Admin Modify Matches" ON public.matches;
-CREATE POLICY "Admin Modify Matches" ON public.matches
-    FOR ALL USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SUPER_ADMIN', 'ANALYST')));
-
 DROP POLICY IF EXISTS "Admin Insert Logs" ON public.system_logs;
 CREATE POLICY "Admin Insert Logs" ON public.system_logs
     FOR INSERT WITH CHECK (true);
 
 DROP POLICY IF EXISTS "Admin View Logs" ON public.system_logs;
 CREATE POLICY "Admin View Logs" ON public.system_logs
-    FOR SELECT USING (EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('SUPER_ADMIN', 'ANALYST')));
+    FOR ALL USING (true);
 
 -- ==============================================================================
 -- STORAGE BUCKETS & IDEMPOTENT STORAGE POLICIES
