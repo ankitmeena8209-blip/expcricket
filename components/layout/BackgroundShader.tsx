@@ -61,20 +61,20 @@ export default function BackgroundShader() {
           vec2 uv = v_texCoord;
           vec2 mouse = u_mouse / u_resolution;
           
-          float noise = sin(uv.x * 10.0 + u_time * 0.5) * cos(uv.y * 10.0 + u_time * 0.5);
-          noise += sin(uv.x * 20.0 - u_time * 0.2) * 0.5;
+          float noise = sin(uv.x * 8.0 + u_time * 0.4) * cos(uv.y * 8.0 + u_time * 0.4);
+          noise += sin(uv.x * 16.0 - u_time * 0.2) * 0.5;
           
-          vec3 color1 = vec3(0.066, 0.075, 0.090);
-          vec3 color2 = vec3(0.102, 0.110, 0.125);
-          vec3 accent = vec3(0.133, 0.772, 0.369);
+          vec3 color1 = vec3(0.078, 0.074, 0.074); // #141313
+          vec3 color2 = vec3(0.125, 0.121, 0.125); // #201f20
+          vec3 accent = vec3(0.8, 0.8, 0.82);      // Subtle silver telemetry glow
           
-          float gradient = smoothstep(0.0, 1.0, uv.y + noise * 0.1);
+          float gradient = smoothstep(0.0, 1.0, uv.y + noise * 0.08);
           vec3 finalColor = mix(color1, color2, gradient);
           
           float dist = length(uv - mouse);
-          finalColor += accent * (1.0 - smoothstep(0.0, 0.6, dist)) * 0.04;
+          finalColor += accent * (1.0 - smoothstep(0.0, 0.5, dist)) * 0.03;
           
-          float vignette = 1.0 - length(uv - 0.5) * 0.5;
+          float vignette = 1.0 - length(uv - 0.5) * 0.4;
           finalColor *= vignette;
 
           gl_FragColor = vec4(finalColor, 1.0);
@@ -136,7 +136,7 @@ export default function BackgroundShader() {
 
     let animationFrameId: number;
     let lastFrameTime = 0;
-    const targetFpsInterval = 1000 / 30; // Throttle to max 30 FPS for low CPU/GPU load
+    const targetFpsInterval = 1000 / 30;
 
     function render(t: number) {
       if (isContextLost || !gl || !canvas) return;
@@ -161,7 +161,6 @@ export default function BackgroundShader() {
       canvas.removeEventListener("webglcontextlost", handleContextLost);
       cancelAnimationFrame(animationFrameId);
 
-      // Clean up WebGL resources to prevent GPU memory leaks
       try {
         if (gl) {
           gl.deleteBuffer(buf);
@@ -176,7 +175,7 @@ export default function BackgroundShader() {
   }, [mounted]);
 
   if (!mounted) {
-    return <div className="fixed inset-0 w-full h-full bg-[#111317] -z-10" />;
+    return <div className="fixed inset-0 w-full h-full bg-[#141313] -z-10" />;
   }
 
   return (

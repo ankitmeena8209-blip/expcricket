@@ -3,8 +3,6 @@
 import React, { useState, useEffect } from "react";
 import { MOCK_RANKINGS, RankingItem } from "@/lib/mockData/rankings";
 import { PlayerService } from "@/services/playerService";
-import Badge from "@/components/common/Badge";
-import Tabs from "@/components/common/Tabs";
 import SkeletonLoader from "@/components/common/SkeletonLoader";
 
 export default function RankingsPage() {
@@ -27,7 +25,7 @@ export default function RankingsPage() {
               playerName: p.name,
               country: p.country,
               countryCode: p.countryCode,
-              rating: 850 - idx * 25,
+              rating: 880 - idx * 24,
               change: idx % 3 === 0 ? "UP" : idx % 3 === 1 ? "DOWN" : "SAME",
             }));
             setLiveList(items.length > 0 ? items : MOCK_RANKINGS[category][format] || []);
@@ -49,77 +47,91 @@ export default function RankingsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Header Banner */}
+      <div className="p-6 lg:p-8 rounded-3xl glass-panel border border-outline-variant/30 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="material-symbols-outlined text-primary text-2xl">leaderboard</span>
-            <h1 className="font-headline font-black text-2xl lg:text-3xl text-on-surface">
-              ICC & EXP Player Rankings
+          <div className="flex items-center gap-3 mb-1">
+            <span className="material-symbols-outlined text-secondary text-2xl">leaderboard</span>
+            <h1 className="font-display-lg font-bold text-2xl lg:text-3xl text-primary">
+              Global Player Telemetry Rankings
             </h1>
-            <Badge variant="primary">OFFICIAL TELEMETRY</Badge>
           </div>
           <p className="text-xs font-mono-data text-outline">
-            Updated player ratings across Test, ODI, and T20 International formats
+            Realtime ICC & Stitch Pro performance rating indexes across Test, ODI, and T20I formats.
           </p>
         </div>
 
+        {/* Filter Controls */}
         <div className="flex flex-wrap items-center gap-3">
-          <Tabs
-            tabs={[
-              { id: "BATTER", label: "BATTERS" },
-              { id: "BOWLER", label: "BOWLERS" },
-            ]}
-            activeTab={category}
-            onChange={(c) => setCategory(c as "BATTER" | "BOWLER")}
-          />
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-surface-container-high border border-outline-variant/20">
+            <button
+              onClick={() => setCategory("BATTER")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-mono-data transition-all ${
+                category === "BATTER" ? "bg-primary text-on-primary shadow-sm" : "text-outline hover:text-primary"
+              }`}
+            >
+              Batters
+            </button>
+            <button
+              onClick={() => setCategory("BOWLER")}
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-mono-data transition-all ${
+                category === "BOWLER" ? "bg-primary text-on-primary shadow-sm" : "text-outline hover:text-primary"
+              }`}
+            >
+              Bowlers
+            </button>
+          </div>
 
-          <Tabs
-            tabs={[
-              { id: "ODI", label: "ODI" },
-              { id: "TEST", label: "TEST" },
-              { id: "T20I", label: "T20I" },
-            ]}
-            activeTab={format}
-            onChange={(f) => setFormat(f as "TEST" | "ODI" | "T20I")}
-          />
+          <div className="flex items-center gap-1 p-1 rounded-xl bg-surface-container-high border border-outline-variant/20">
+            {(["ODI", "TEST", "T20I"] as const).map((fmt) => (
+              <button
+                key={fmt}
+                onClick={() => setFormat(fmt)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold font-mono-data transition-all ${
+                  format === fmt ? "bg-primary text-on-primary shadow-sm" : "text-outline hover:text-primary"
+                }`}
+              >
+                {fmt}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
       {/* Rankings Table */}
-      <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/30">
+      <div className="p-6 lg:p-8 rounded-3xl glass-panel border border-outline-variant/30 space-y-4">
         {loading ? (
-          <SkeletonLoader className="h-64 w-full" />
+          <SkeletonLoader className="h-64 w-full rounded-2xl" />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono-data">
               <thead>
-                <tr className="border-b border-outline-variant/30 text-outline uppercase text-[10px]">
+                <tr className="border-b border-outline-variant/20 text-outline uppercase text-[10px] tracking-wider">
                   <th className="pb-3 font-semibold">Rank</th>
                   <th className="pb-3 font-semibold">Player</th>
-                  <th className="pb-3 font-semibold">Country</th>
-                  <th className="pb-3 font-semibold text-right">Rating</th>
-                  <th className="pb-3 font-semibold text-right">Trend</th>
+                  <th className="pb-3 font-semibold">Nation</th>
+                  <th className="pb-3 font-semibold text-right">Telemetry Rating</th>
+                  <th className="pb-3 font-semibold text-right">Rating Trend</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-outline-variant/15 text-on-surface">
+              <tbody className="divide-y divide-outline-variant/10 text-on-surface">
                 {liveList.map((item) => (
-                  <tr key={item.rank} className="hover:bg-surface-container-high/40 transition-colors">
-                    <td className="py-3.5 font-headline font-bold text-base text-primary">
+                  <tr key={item.rank} className="hover:bg-surface-container-high/50 transition-colors">
+                    <td className="py-4 font-display-lg font-bold text-base text-primary">
                       #{item.rank}
                     </td>
-                    <td className="py-3.5 font-bold text-on-surface text-sm">
+                    <td className="py-4 font-bold text-primary text-sm">
                       {item.playerName}
                     </td>
-                    <td className="py-3.5 text-on-surface-variant font-semibold">
+                    <td className="py-4 text-on-surface-variant font-semibold">
                       {item.country} ({item.countryCode})
                     </td>
-                    <td className="py-3.5 text-right font-bold text-primary text-sm">
+                    <td className="py-4 text-right font-bold text-emerald-400 text-sm">
                       {item.rating}
                     </td>
-                    <td className="py-3.5 text-right">
-                      {item.change === "UP" && <span className="text-primary font-bold">↑ UP</span>}
-                      {item.change === "DOWN" && <span className="text-error font-bold">↓ DOWN</span>}
+                    <td className="py-4 text-right">
+                      {item.change === "UP" && <span className="text-emerald-400 font-bold">↑ UP</span>}
+                      {item.change === "DOWN" && <span className="text-rose-300 font-bold">↓ DOWN</span>}
                       {item.change === "SAME" && <span className="text-outline">− SAME</span>}
                     </td>
                   </tr>

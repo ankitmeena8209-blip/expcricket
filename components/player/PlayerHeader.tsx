@@ -4,8 +4,6 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Player } from "@/types/player";
-import Badge from "../common/Badge";
-import Button from "../common/Button";
 import { useFavorites } from "@/hooks/useFavorites";
 
 interface PlayerHeaderProps {
@@ -17,50 +15,40 @@ export default function PlayerHeader({ player }: PlayerHeaderProps) {
   const bookmarked = isFavorite(player.id);
 
   return (
-    <div
-      className="p-6 lg:p-8 rounded-3xl relative overflow-hidden border border-outline-variant/30 shadow-2xl transition-all"
-      style={{
-        background: `linear-gradient(135deg, ${player.primaryColor}22 0%, #111317 70%, #1a1c20 100%)`,
-      }}
-    >
-      {/* Dynamic Background Glow Accent */}
+    <div className="p-6 lg:p-10 rounded-3xl glass-panel relative overflow-hidden border border-outline-variant/30 shadow-modal-shadow">
+      {/* Background Radial Glow */}
       <div
-        className="absolute -top-20 -right-20 w-80 h-80 rounded-full blur-3xl opacity-30 pointer-events-none"
-        style={{ backgroundColor: player.primaryColor }}
+        className="absolute -top-20 -right-20 w-80 h-80 rounded-full blur-3xl opacity-20 pointer-events-none"
+        style={{ backgroundColor: player.primaryColor || "#ffffff" }}
       />
 
       <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative z-10">
-        {/* Left: Avatar & Meta */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-          <div
-            className="w-24 h-24 lg:w-28 lg:h-28 rounded-2xl p-1 relative overflow-hidden shadow-xl"
-            style={{
-              background: `linear-gradient(135deg, ${player.primaryColor}, ${player.accentColor})`,
-            }}
-          >
+        {/* Avatar & Player Meta */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
+          <div className="w-24 h-24 lg:w-32 lg:h-32 rounded-2xl p-1 relative overflow-hidden shadow-2xl bg-surface-container-high border border-outline-variant/40 shrink-0">
             <Image
               src={player.avatarUrl}
               alt={player.name}
-              width={112}
-              height={112}
+              width={128}
+              height={128}
               className="w-full h-full object-cover rounded-xl"
               priority
             />
           </div>
 
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="font-headline font-black text-2xl lg:text-3xl text-on-surface tracking-tight">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-3">
+              <h1 className="font-display-lg font-bold text-2xl sm:text-3xl lg:text-4xl text-primary tracking-tight">
                 {player.fullName}
-              </span>
-              <Badge variant="primary">
+              </h1>
+              <span className="px-3 py-1 rounded-full bg-surface-bright border border-outline-variant/30 text-xs font-mono-data font-bold text-primary">
                 RANK #{player.iccRankings.odi || player.iccRankings.test || 1}
-              </Badge>
+              </span>
             </div>
 
             <div className="flex flex-wrap items-center gap-2 text-xs font-mono-data text-on-surface-variant">
-              <span className="flex items-center gap-1 font-semibold text-on-surface">
-                <span className="w-2 h-2 rounded-full" style={{ backgroundColor: player.primaryColor }} />
+              <span className="flex items-center gap-1.5 font-semibold text-primary">
+                <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: player.primaryColor || "#ffffff" }} />
                 {player.country} ({player.countryCode})
               </span>
               <span>•</span>
@@ -71,29 +59,42 @@ export default function PlayerHeader({ player }: PlayerHeaderProps) {
               <span>{player.bowlingStyle}</span>
             </div>
 
-            <div className="mt-3 flex items-center gap-2">
-              <Badge variant="secondary">TEST RANK #{player.iccRankings.test}</Badge>
-              <Badge variant="tertiary">ODI RANK #{player.iccRankings.odi}</Badge>
-              <Badge variant="outline">T20I RANK #{player.iccRankings.t20i}</Badge>
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/20 text-[11px] font-mono-data text-outline">
+                TEST #{player.iccRankings.test}
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/20 text-[11px] font-mono-data text-outline">
+                ODI #{player.iccRankings.odi}
+              </span>
+              <span className="px-2.5 py-1 rounded-lg bg-surface-container-high border border-outline-variant/20 text-[11px] font-mono-data text-outline">
+                T20I #{player.iccRankings.t20i}
+              </span>
             </div>
           </div>
         </div>
 
-        {/* Right Action Controls */}
-        <div className="flex items-center gap-3">
-          <Button
-            variant={bookmarked ? "primary" : "secondary"}
-            size="sm"
-            icon={bookmarked ? "star" : "star_outline"}
+        {/* Action Controls */}
+        <div className="flex flex-wrap items-center gap-3">
+          <button
             onClick={() => toggleFavorite(player.id)}
+            className={`px-4 py-2.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 ${
+              bookmarked
+                ? "bg-primary text-on-primary shadow-sm"
+                : "bg-surface-container-high text-primary hover:bg-surface-bright border border-outline-variant/30"
+            }`}
           >
-            {bookmarked ? "Bookmarked" : "Bookmark Player"}
-          </Button>
+            <span className="material-symbols-outlined text-base">
+              {bookmarked ? "star" : "star_outline"}
+            </span>
+            <span>{bookmarked ? "Bookmarked" : "Bookmark"}</span>
+          </button>
 
-          <Link href={`/compare?playerA=${player.id}`}>
-            <Button variant="outline" size="sm" icon="compare_arrows">
-              Compare
-            </Button>
+          <Link
+            href={`/compare?playerA=${player.id}`}
+            className="px-4 py-2.5 rounded-xl bg-surface-container-high hover:bg-surface-bright text-primary border border-outline-variant/30 text-xs font-semibold transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-base">compare_arrows</span>
+            <span>Head to Head</span>
           </Link>
         </div>
       </div>

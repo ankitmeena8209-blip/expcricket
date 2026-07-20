@@ -3,9 +3,6 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import StatCard from "@/components/common/StatCard";
-import Badge from "@/components/common/Badge";
-import Button from "@/components/common/Button";
 import PitchMap from "@/components/charts/PitchMap";
 import SkeletonLoader from "@/components/common/SkeletonLoader";
 import { Match } from "@/types/match";
@@ -37,7 +34,7 @@ export default function CommandCenterHome() {
           setGrounds(gList);
         }
       } catch (err) {
-        console.error("Error loading command center live data:", err);
+        console.error("Error loading live telemetry data:", err);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -52,38 +49,45 @@ export default function CommandCenterHome() {
   const featuredPlayers = players.slice(0, 3);
 
   return (
-    <div className="space-y-8">
-      {/* Hero Header */}
-      <div className="p-6 lg:p-10 rounded-3xl bg-gradient-to-r from-surface-container-low via-surface-container to-surface-container-high border border-outline-variant/30 relative overflow-hidden shadow-2xl">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="max-w-3xl space-y-4 relative z-10">
-          <div className="flex items-center gap-2">
-            <Badge variant="primary" size="md">
-              COMMAND CENTER V1.0
-            </Badge>
-            <span className="text-xs font-mono-data text-outline">
-              REALTIME TELEMETRY ACTIVE
+    <div className="space-y-10 relative">
+      {/* Radial Glow Effect */}
+      <div className="hero-glow" />
+
+      {/* Hero Header Banner */}
+      <div className="p-8 lg:p-12 rounded-3xl glass-panel relative overflow-hidden shadow-modal-shadow border border-outline-variant/20">
+        <div className="max-w-3xl space-y-5 relative z-10">
+          <div className="flex items-center gap-3">
+            <span className="px-3 py-1 rounded-full bg-surface-container-high border border-outline-variant/30 text-[11px] font-mono-data font-bold text-primary tracking-wider uppercase">
+              Stitch Cricket Pro v2.5
+            </span>
+            <span className="flex items-center gap-1.5 text-xs font-mono-data text-emerald-400">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+              LIVE TELEMETRY ENGINE
             </span>
           </div>
 
-          <h1 className="font-headline font-black text-3xl sm:text-4xl lg:text-5xl tracking-tight text-on-surface leading-tight">
-            The Future of <span className="text-primary">Cricket Intelligence.</span>
+          <h1 className="font-display-lg text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-primary leading-tight">
+            Deep Intelligence for the <span className="text-secondary">Modern Game.</span>
           </h1>
 
           <p className="text-sm lg:text-base text-on-surface-variant max-w-2xl leading-relaxed">
-            Institutional-grade match telemetry, predictive pitch vector models, player matchups, and multi-model AI analyst suite built for high-performance sports analytics.
+            Institutional-grade match telemetry, predictive pitch vector models, head-to-head battle matrices, and multi-model AI analyst suite built for elite cricket decision-making.
           </p>
 
-          <div className="pt-2 flex flex-wrap items-center gap-3">
-            <Link href="/player-intelligence">
-              <Button variant="primary" icon="person">
-                Explore Player Profiles
-              </Button>
+          <div className="pt-3 flex flex-wrap items-center gap-4">
+            <Link
+              href="/match-analysis"
+              className="px-6 py-3 rounded-xl bg-primary hover:bg-primary-fixed text-on-primary font-semibold text-sm transition-all shadow-md flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-lg">sports_cricket</span>
+              <span>Live Match Center</span>
             </Link>
-            <Link href="/ai-analyst">
-              <Button variant="secondary" icon="psychology">
-                Launch AI Analyst
-              </Button>
+            <Link
+              href="/ai-analyst"
+              className="px-6 py-3 rounded-xl bg-surface-container-high hover:bg-surface-bright text-primary font-semibold text-sm transition-all border border-outline-variant/30 flex items-center gap-2"
+            >
+              <span className="material-symbols-outlined text-lg text-amber-400">auto_awesome</span>
+              <span>Launch AI Hub</span>
             </Link>
           </div>
         </div>
@@ -91,136 +95,157 @@ export default function CommandCenterHome() {
 
       {/* Core Platform KPIs */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard
-          title="PLAYERS TRACKED"
-          value={players.length > 0 ? `${players.length}+` : "5,420+"}
-          subtitle="Across Test, ODI, T20 formats"
-          icon="groups"
-          accentColor="#4be277"
-        />
-        <StatCard
-          title="VENUES ANALYZED"
-          value={grounds.length > 0 ? `${grounds.length}` : "184"}
-          subtitle="Pitch telemetry & boundary maps"
-          icon="stadium"
-          accentColor="#c0c1ff"
-        />
-        <StatCard
-          title="MATCH DATA RECORDS"
-          value={matches.length > 0 ? `${matches.length} Live` : "100+ Live"}
-          subtitle="Realtime CricAPI Telemetry"
-          icon="database"
-          accentColor="#ffba61"
-        />
-        <StatCard
-          title="AI PREDICTIVE MODELS"
-          value="42"
-          subtitle="Win probability & pitch vectors"
-          icon="psychology"
-          accentColor="#4be277"
-        />
+        <div className="p-5 rounded-2xl glass-card border border-outline-variant/20 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono-data font-bold text-outline uppercase tracking-wider">
+              Players Tracked
+            </span>
+            <span className="material-symbols-outlined text-outline text-xl">groups</span>
+          </div>
+          <div className="text-2xl lg:text-3xl font-bold font-mono-data text-primary">
+            {players.length > 0 ? `${players.length}+` : "5,420+"}
+          </div>
+          <p className="text-[11px] text-on-surface-variant">Across Test, ODI, T20</p>
+        </div>
+
+        <div className="p-5 rounded-2xl glass-card border border-outline-variant/20 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono-data font-bold text-outline uppercase tracking-wider">
+              Venues Analyzed
+            </span>
+            <span className="material-symbols-outlined text-outline text-xl">stadium</span>
+          </div>
+          <div className="text-2xl lg:text-3xl font-bold font-mono-data text-primary">
+            {grounds.length > 0 ? `${grounds.length}` : "184"}
+          </div>
+          <p className="text-[11px] text-on-surface-variant">Pitch telemetry & vectors</p>
+        </div>
+
+        <div className="p-5 rounded-2xl glass-card border border-outline-variant/20 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono-data font-bold text-outline uppercase tracking-wider">
+              Telemetry Records
+            </span>
+            <span className="material-symbols-outlined text-outline text-xl">database</span>
+          </div>
+          <div className="text-2xl lg:text-3xl font-bold font-mono-data text-primary">
+            {matches.length > 0 ? `${matches.length} Live` : "100+ Live"}
+          </div>
+          <p className="text-[11px] text-on-surface-variant">Realtime CricAPI feed</p>
+        </div>
+
+        <div className="p-5 rounded-2xl glass-card border border-outline-variant/20 space-y-1">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-mono-data font-bold text-outline uppercase tracking-wider">
+              AI Predictors
+            </span>
+            <span className="material-symbols-outlined text-amber-400 text-xl">psychology</span>
+          </div>
+          <div className="text-2xl lg:text-3xl font-bold font-mono-data text-primary">
+            42 Models
+          </div>
+          <p className="text-[11px] text-on-surface-variant">Win vectors & pitch decay</p>
+        </div>
       </div>
 
-      {/* Live Match Intelligence Card */}
+      {/* Live Match Telemetry Section */}
       {loading ? (
-        <SkeletonLoader className="h-64 w-full" />
+        <SkeletonLoader className="h-64 w-full rounded-3xl" />
       ) : liveMatch ? (
-        <div className="p-6 lg:p-8 rounded-3xl bg-surface-container-low border border-primary/40 relative overflow-hidden shadow-xl">
-          <div className="flex items-center justify-between mb-4 border-b border-outline-variant/20 pb-3">
-            <div className="flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-primary animate-ping" />
-              <span className="text-xs font-mono-data font-bold text-primary uppercase tracking-wider">
-                FEATURED LIVE MATCH TELEMETRY
+        <div className="p-6 lg:p-8 rounded-3xl glass-panel border border-outline-variant/30 space-y-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-outline-variant/10 pb-4">
+            <div className="flex items-center gap-3">
+              <span className="w-3 h-3 rounded-full bg-rose-500 animate-ping" />
+              <h2 className="font-display-lg text-lg font-bold text-primary tracking-tight">
+                Featured Live Telemetry
+              </h2>
+              <span className="px-2.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 text-[10px] font-mono-data font-bold">
+                {liveMatch.status}
               </span>
             </div>
-            <Badge variant={liveMatch.status === "LIVE" ? "error" : "primary"} size="sm">
-              {liveMatch.status}
-            </Badge>
+            <span className="text-xs font-mono-data text-outline">
+              {liveMatch.series} • {liveMatch.venue}
+            </span>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-center">
-            {/* Teams & Scorecard */}
+            {/* Scorecard Split */}
             <div className="lg:col-span-2 space-y-4">
-              <span className="text-xs font-mono-data text-outline block">
-                {liveMatch.series} • {liveMatch.venue}
-              </span>
-              <h2 className="font-headline font-bold text-xl text-on-surface">
+              <h3 className="font-display-lg font-bold text-xl text-primary">
                 {liveMatch.title}
-              </h2>
+              </h3>
 
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="p-4 rounded-xl bg-surface-container-high border border-outline-variant/30">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-headline font-bold text-lg text-on-surface">
-                      {liveMatch.teamA.name} ({liveMatch.teamA.code})
-                    </span>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/20">
+                  <span className="text-xs font-mono-data text-outline block mb-1 uppercase">
+                    {liveMatch.teamA.name} ({liveMatch.teamA.code})
+                  </span>
                   {liveMatch.teamA.scoreCard?.map((sc, i) => (
-                    <div key={i} className="text-sm font-mono-data text-primary font-bold">
-                      {sc.runs}/{sc.wickets} ({sc.overs} ov)
+                    <div key={i} className="text-lg font-mono-data text-primary font-bold">
+                      {sc.runs}/{sc.wickets} <span className="text-xs font-normal text-on-surface-variant">({sc.overs} ov)</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="p-4 rounded-xl bg-surface-container-high border border-outline-variant/30">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-headline font-bold text-lg text-on-surface">
-                      {liveMatch.teamB.name} ({liveMatch.teamB.code})
-                    </span>
-                  </div>
+                <div className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/20">
+                  <span className="text-xs font-mono-data text-outline block mb-1 uppercase">
+                    {liveMatch.teamB.name} ({liveMatch.teamB.code})
+                  </span>
                   {liveMatch.teamB.scoreCard?.map((sc, i) => (
-                    <div key={i} className="text-sm font-mono-data text-on-surface font-bold">
-                      {sc.runs}/{sc.wickets} ({sc.overs} ov)
+                    <div key={i} className="text-lg font-mono-data text-primary font-bold">
+                      {sc.runs}/{sc.wickets} <span className="text-xs font-normal text-on-surface-variant">({sc.overs} ov)</span>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="p-3 rounded-xl bg-surface-container border border-outline-variant/20 text-xs font-mono-data text-primary">
-                ⚡ {liveMatch.resultSummary}
+              <div className="p-3.5 rounded-xl bg-surface-container-high border border-outline-variant/20 text-xs font-mono-data text-emerald-400 flex items-center gap-2">
+                <span className="material-symbols-outlined text-base">bolt</span>
+                <span>{liveMatch.resultSummary}</span>
               </div>
             </div>
 
-            {/* Quick Action */}
+            {/* Win Probability Box */}
             <div className="p-5 rounded-2xl bg-surface-container-high border border-outline-variant/30 space-y-3 text-center">
-              <span className="text-xs font-mono-data text-outline block uppercase">
-                WIN PROBABILITY MODEL
+              <span className="text-[11px] font-mono-data text-outline block uppercase tracking-wider">
+                Live Win Matrix
               </span>
-              <div className="text-3xl font-headline font-black text-primary">
-                55% {liveMatch.teamA.code} <span className="text-outline text-xl font-normal">/ 45% {liveMatch.teamB.code}</span>
+              <div className="text-2xl font-bold font-mono-data text-primary">
+                55% {liveMatch.teamA.code} <span className="text-outline text-base font-normal">/ 45% {liveMatch.teamB.code}</span>
               </div>
-              <p className="text-[11px] font-mono-data text-on-surface-variant">
-                Telemetry prediction based on venue historical data and live pitch vectors.
+              <p className="text-[11px] text-on-surface-variant leading-relaxed">
+                Calculated dynamically using pitch degradation and ball-by-ball vectors.
               </p>
-              <Link href={`/match-analysis?id=${liveMatch.id}`} className="block">
-                <Button variant="primary" size="sm" className="w-full">
-                  Open Live Match Matrix
-                </Button>
+              <Link
+                href={`/match-analysis?id=${liveMatch.id}`}
+                className="w-full py-2.5 px-4 bg-primary hover:bg-primary-fixed text-on-primary font-semibold text-xs rounded-xl transition-all block text-center shadow-md"
+              >
+                Open Full Live Match Matrix
               </Link>
             </div>
           </div>
         </div>
       ) : null}
 
-      {/* Trending Profiles & Ground Analysis Dual Section */}
+      {/* Trending Player Profiles & Ground Intel Dual Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left 2 Cols: Trending Player Profiles */}
+        {/* Trending Player Profiles */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-headline font-bold text-xl text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">trending_up</span>
-              Trending Profiles
+            <h3 className="font-display-lg font-bold text-xl text-primary flex items-center gap-2">
+              <span className="material-symbols-outlined text-secondary">trending_up</span>
+              Player Intelligence Spotlight
             </h3>
-            <Link href="/player-intelligence" className="text-xs font-mono-data text-primary hover:underline">
+            <Link href="/player-intelligence" className="text-xs font-mono-data text-secondary hover:underline">
               View All Players →
             </Link>
           </div>
 
           {loading ? (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <SkeletonLoader className="h-40 w-full" />
-              <SkeletonLoader className="h-40 w-full" />
-              <SkeletonLoader className="h-40 w-full" />
+              <SkeletonLoader className="h-44 w-full rounded-2xl" />
+              <SkeletonLoader className="h-44 w-full rounded-2xl" />
+              <SkeletonLoader className="h-44 w-full rounded-2xl" />
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -228,29 +253,25 @@ export default function CommandCenterHome() {
                 <Link
                   key={player.id}
                   href={`/player-intelligence?id=${player.id}`}
-                  className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 hover:border-primary/50 transition-all group relative overflow-hidden"
+                  className="p-5 rounded-2xl glass-card border border-outline-variant/30 hover:border-primary/40 transition-all group relative overflow-hidden"
                 >
-                  <div
-                    className="absolute top-0 left-0 right-0 h-1"
-                    style={{ backgroundColor: player.primaryColor }}
-                  />
-                  <div className="w-16 h-16 rounded-xl overflow-hidden mb-3 border border-outline-variant/30">
+                  <div className="w-14 h-14 rounded-2xl overflow-hidden mb-3 border border-outline-variant/30 bg-surface-container-high">
                     <Image
                       src={player.avatarUrl}
                       alt={player.name}
-                      width={64}
-                      height={64}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                      width={56}
+                      height={56}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                     />
                   </div>
-                  <h4 className="font-headline font-bold text-base text-on-surface group-hover:text-primary transition-colors">
+                  <h4 className="font-display-lg font-bold text-base text-primary group-hover:text-secondary transition-colors">
                     {player.name}
                   </h4>
                   <p className="text-xs font-mono-data text-outline mb-2">
                     {player.country} • {player.role}
                   </p>
                   <div className="text-xs font-mono-data font-bold text-on-surface">
-                    Avg: <span className="text-primary">{player.stats?.ODI?.batting?.average || player.stats?.ALL?.batting?.average || 45}</span>
+                    Average: <span className="text-primary">{player.stats?.ODI?.batting?.average || player.stats?.ALL?.batting?.average || 48.5}</span>
                   </div>
                 </Link>
               ))}
@@ -258,14 +279,14 @@ export default function CommandCenterHome() {
           )}
         </div>
 
-        {/* Right 1 Col: Featured Ground Analysis */}
+        {/* Featured Ground Intelligence */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="font-headline font-bold text-xl text-on-surface flex items-center gap-2">
-              <span className="material-symbols-outlined text-primary">stadium</span>
-              Featured Venue
+            <h3 className="font-display-lg font-bold text-xl text-primary flex items-center gap-2">
+              <span className="material-symbols-outlined text-secondary">stadium</span>
+              Venue Telemetry
             </h3>
-            <Link href="/ground-intelligence" className="text-xs font-mono-data text-primary hover:underline">
+            <Link href="/ground-intelligence" className="text-xs font-mono-data text-secondary hover:underline">
               Ground Intel →
             </Link>
           </div>
@@ -274,26 +295,28 @@ export default function CommandCenterHome() {
         </div>
       </div>
 
-      {/* AI Assistant Launcher Banner */}
-      <div className="p-6 lg:p-8 rounded-3xl bg-gradient-to-r from-surface-container-high via-surface-container to-surface-container-low border border-tertiary/40 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+      {/* AI Assistant Banner */}
+      <div className="p-8 rounded-3xl glass-panel border border-outline-variant/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-modal-shadow">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-tertiary text-2xl">psychology</span>
-            <span className="text-xs font-mono-data font-bold text-tertiary uppercase tracking-wider">
-              AI CRICKET INTELLIGENCE ENGINE
+            <span className="material-symbols-outlined text-amber-400 text-2xl">psychology</span>
+            <span className="text-xs font-mono-data font-bold text-amber-300 uppercase tracking-wider">
+              AI Cricket Intelligence Suite
             </span>
           </div>
-          <h3 className="font-headline font-bold text-2xl text-on-surface">
-            Ask any tactical question about players, pitches, or match scenarios.
+          <h3 className="font-display-lg font-bold text-2xl text-primary">
+            Ask any tactical query about players, pitch conditions, or match vectors.
           </h3>
           <p className="text-xs font-mono-data text-on-surface-variant">
-            Powered by multi-provider strategy: Gemini 1.5 Pro, OpenAI GPT-4o, and Grok 2.
+            Seamless multi-model predictive engine connected to Supabase & CricAPI telemetry.
           </p>
         </div>
-        <Link href="/ai-analyst">
-          <Button variant="primary" size="lg" icon="arrow_forward">
-            Launch AI Assistant
-          </Button>
+        <Link
+          href="/ai-analyst"
+          className="px-6 py-3 rounded-xl bg-primary hover:bg-primary-fixed text-on-primary font-semibold text-xs transition-all shrink-0 flex items-center gap-2 shadow-md"
+        >
+          <span>Launch AI Assistant</span>
+          <span className="material-symbols-outlined text-base">arrow_forward</span>
         </Link>
       </div>
     </div>
