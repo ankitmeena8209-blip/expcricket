@@ -1,6 +1,7 @@
 import { Ground } from "@/types/ground";
 import { MOCK_GROUNDS } from "@/lib/mockData/grounds";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { CricketDataService } from "@/services/cricketDataService";
 
 function withTimeout<T>(promise: PromiseLike<T>, ms: number = 3000): Promise<T> {
   return Promise.race([
@@ -34,6 +35,13 @@ export class GroundService {
         console.warn("Supabase grounds query fallback:", err);
       }
     }
+
+    // Live Cricket API Fetch Fallback
+    const liveGrounds = await CricketDataService.fetchLiveGrounds();
+    if (liveGrounds && liveGrounds.length > 0) {
+      return liveGrounds;
+    }
+
     return MOCK_GROUNDS;
   }
 
@@ -61,8 +69,13 @@ export class GroundService {
         console.warn(`Supabase getGroundById(${id}) fallback:`, err);
       }
     }
-    const ground = MOCK_GROUNDS.find((g) => g.id === id);
-    return ground || MOCK_GROUNDS[0];
+
+    const allGrounds = await this.getAllGrounds();
+    const ground = allGrounds.find((g) => g.id === id);
+    if (ground) return ground;
+
+    const mockGround = MOCK_GROUNDS.find((g) => g.id === id);
+    return mockGround || allGrounds[0] || MOCK_GROUNDS[0];
   }
 
   static async createGround(ground: Partial<Ground>): Promise<boolean> {

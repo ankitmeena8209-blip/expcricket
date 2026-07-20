@@ -1,6 +1,7 @@
 import { Match } from "@/types/match";
 import { MOCK_MATCHES } from "@/lib/mockData/matches";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { CricketDataService } from "@/services/cricketDataService";
 
 function withTimeout<T>(promise: PromiseLike<T>, ms: number = 3000): Promise<T> {
   return Promise.race([
@@ -35,6 +36,13 @@ export class MatchService {
         console.warn("Supabase matches query fallback:", err);
       }
     }
+
+    // Live Cricket API Fetch Fallback
+    const liveMatches = await CricketDataService.fetchLiveMatches();
+    if (liveMatches && liveMatches.length > 0) {
+      return liveMatches;
+    }
+
     return MOCK_MATCHES;
   }
 
@@ -63,8 +71,13 @@ export class MatchService {
         console.warn(`Supabase getMatchById(${id}) fallback:`, err);
       }
     }
-    const match = MOCK_MATCHES.find((m) => m.id === id);
-    return match || MOCK_MATCHES[0];
+
+    const allMatches = await this.getAllMatches();
+    const match = allMatches.find((m) => m.id === id);
+    if (match) return match;
+
+    const mockMatch = MOCK_MATCHES.find((m) => m.id === id);
+    return mockMatch || allMatches[0] || MOCK_MATCHES[0];
   }
 
   static async createMatch(match: Partial<Match>): Promise<boolean> {

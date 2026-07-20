@@ -1,6 +1,7 @@
 import { Player } from "@/types/player";
 import { MOCK_PLAYERS } from "@/lib/mockData/players";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { CricketDataService } from "@/services/cricketDataService";
 
 function withTimeout<T>(promise: PromiseLike<T>, ms: number = 3000): Promise<T> {
   return Promise.race([
@@ -39,6 +40,13 @@ export class PlayerService {
         console.warn("Supabase players query fallback:", err);
       }
     }
+
+    // Live Cricket API Fetch Fallback
+    const livePlayers = await CricketDataService.fetchLivePlayers();
+    if (livePlayers && livePlayers.length > 0) {
+      return livePlayers;
+    }
+
     return MOCK_PLAYERS;
   }
 
@@ -71,8 +79,13 @@ export class PlayerService {
         console.warn(`Supabase getPlayerById(${id}) fallback:`, err);
       }
     }
-    const player = MOCK_PLAYERS.find((p) => p.id === id);
-    return player || MOCK_PLAYERS[0];
+
+    const allPlayers = await this.getAllPlayers();
+    const player = allPlayers.find((p) => p.id === id);
+    if (player) return player;
+
+    const mockPlayer = MOCK_PLAYERS.find((p) => p.id === id);
+    return mockPlayer || allPlayers[0] || MOCK_PLAYERS[0];
   }
 
   static async searchPlayers(query: string): Promise<Player[]> {
@@ -88,8 +101,8 @@ export class PlayerService {
   }
 
   static async getFeaturedPlayer(): Promise<Player> {
-    const player = await this.getPlayerById("virat-kohli");
-    return player || MOCK_PLAYERS[0];
+    const players = await this.getAllPlayers();
+    return players[0] || MOCK_PLAYERS[0];
   }
 
   static async createPlayer(player: Partial<Player>): Promise<boolean> {

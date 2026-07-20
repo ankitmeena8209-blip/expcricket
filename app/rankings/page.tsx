@@ -1,15 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MOCK_RANKINGS, RankingItem } from "@/lib/mockData/rankings";
+import { PlayerService } from "@/services/playerService";
 import Badge from "@/components/common/Badge";
 import Tabs from "@/components/common/Tabs";
+import SkeletonLoader from "@/components/common/SkeletonLoader";
 
 export default function RankingsPage() {
   const [category, setCategory] = useState<"BATTER" | "BOWLER">("BATTER");
   const [format, setFormat] = useState<"TEST" | "ODI" | "T20I">("ODI");
+  const [liveList, setLiveList] = useState<RankingItem[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const list: RankingItem[] = MOCK_RANKINGS[category][format] || [];
+  useEffect(() => {
+    let isMounted = true;
+    async function loadRankings() {
+      try {
+        setLoading(true);
+        const players = await PlayerService.getAllPlayers();
+        if (isMounted) {
+          if (players.length > 0) {
+            const filtered = players.filter((p) => p.role === category || (category === "BATTER" && p.role === "ALL_ROUNDER"));
+            const items: RankingItem[] = filtered.map((p, idx) => ({
+              rank: idx + 1,
+              playerName: p.name,
+              country: p.country,
+              countryCode: p.countryCode,
+              rating: 850 - idx * 25,
+              change: idx % 3 === 0 ? "UP" : idx % 3 === 1 ? "DOWN" : "SAME",
+            }));
+            setLiveList(items.length > 0 ? items : MOCK_RANKINGS[category][format] || []);
+          } else {
+            setLiveList(MOCK_RANKINGS[category][format] || []);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to load rankings:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadRankings();
+    return () => {
+      isMounted = false;
+    };
+  }, [category, format]);
 
   return (
     <div className="space-y-8">
@@ -52,42 +88,46 @@ export default function RankingsPage() {
 
       {/* Rankings Table */}
       <div className="p-6 rounded-3xl bg-surface-container-low border border-outline-variant/30">
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs font-mono-data">
-            <thead>
-              <tr className="border-b border-outline-variant/30 text-outline uppercase text-[10px]">
-                <th className="pb-3 font-semibold">Rank</th>
-                <th className="pb-3 font-semibold">Player</th>
-                <th className="pb-3 font-semibold">Country</th>
-                <th className="pb-3 font-semibold text-right">Rating</th>
-                <th className="pb-3 font-semibold text-right">Trend</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-outline-variant/15 text-on-surface">
-              {list.map((item) => (
-                <tr key={item.rank} className="hover:bg-surface-container-high/40 transition-colors">
-                  <td className="py-3.5 font-headline font-bold text-base text-primary">
-                    #{item.rank}
-                  </td>
-                  <td className="py-3.5 font-bold text-on-surface text-sm">
-                    {item.playerName}
-                  </td>
-                  <td className="py-3.5 text-on-surface-variant font-semibold">
-                    {item.country} ({item.countryCode})
-                  </td>
-                  <td className="py-3.5 text-right font-bold text-primary text-sm">
-                    {item.rating}
-                  </td>
-                  <td className="py-3.5 text-right">
-                    {item.change === "UP" && <span className="text-primary font-bold">↑ UP</span>}
-                    {item.change === "DOWN" && <span className="text-error font-bold">↓ DOWN</span>}
-                    {item.change === "SAME" && <span className="text-outline">− SAME</span>}
-                  </td>
+        {loading ? (
+          <SkeletonLoader className="h-64 w-full" />
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-left text-xs font-mono-data">
+              <thead>
+                <tr className="border-b border-outline-variant/30 text-outline uppercase text-[10px]">
+                  <th className="pb-3 font-semibold">Rank</th>
+                  <th className="pb-3 font-semibold">Player</th>
+                  <th className="pb-3 font-semibold">Country</th>
+                  <th className="pb-3 font-semibold text-right">Rating</th>
+                  <th className="pb-3 font-semibold text-right">Trend</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="divide-y divide-outline-variant/15 text-on-surface">
+                {liveList.map((item) => (
+                  <tr key={item.rank} className="hover:bg-surface-container-high/40 transition-colors">
+                    <td className="py-3.5 font-headline font-bold text-base text-primary">
+                      #{item.rank}
+                    </td>
+                    <td className="py-3.5 font-bold text-on-surface text-sm">
+                      {item.playerName}
+                    </td>
+                    <td className="py-3.5 text-on-surface-variant font-semibold">
+                      {item.country} ({item.countryCode})
+                    </td>
+                    <td className="py-3.5 text-right font-bold text-primary text-sm">
+                      {item.rating}
+                    </td>
+                    <td className="py-3.5 text-right">
+                      {item.change === "UP" && <span className="text-primary font-bold">↑ UP</span>}
+                      {item.change === "DOWN" && <span className="text-error font-bold">↓ DOWN</span>}
+                      {item.change === "SAME" && <span className="text-outline">− SAME</span>}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );

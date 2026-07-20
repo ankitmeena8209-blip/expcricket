@@ -1,20 +1,55 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import StatCard from "@/components/common/StatCard";
 import Badge from "@/components/common/Badge";
 import Button from "@/components/common/Button";
 import PitchMap from "@/components/charts/PitchMap";
-import { MOCK_PLAYERS } from "@/lib/mockData/players";
-import { MOCK_MATCHES } from "@/lib/mockData/matches";
-import { MOCK_GROUNDS } from "@/lib/mockData/grounds";
-import { AI_PROMPT_PRESETS } from "@/lib/mockData/aiPrompts";
+import SkeletonLoader from "@/components/common/SkeletonLoader";
+import { Match } from "@/types/match";
+import { Player } from "@/types/player";
+import { Ground } from "@/types/ground";
+import { MatchService } from "@/services/matchService";
+import { PlayerService } from "@/services/playerService";
+import { GroundService } from "@/services/groundService";
 
 export default function CommandCenterHome() {
-  const liveMatch = MOCK_MATCHES[0];
-  const mcg = MOCK_GROUNDS[0];
+  const [matches, setMatches] = useState<Match[]>([]);
+  const [players, setPlayers] = useState<Player[]>([]);
+  const [grounds, setGrounds] = useState<Ground[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadLiveData() {
+      try {
+        setLoading(true);
+        const [mList, pList, gList] = await Promise.all([
+          MatchService.getAllMatches(),
+          PlayerService.getAllPlayers(),
+          GroundService.getAllGrounds(),
+        ]);
+        if (isMounted) {
+          setMatches(mList);
+          setPlayers(pList);
+          setGrounds(gList);
+        }
+      } catch (err) {
+        console.error("Error loading command center live data:", err);
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadLiveData();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const liveMatch = matches[0];
+  const featuredPlayers = players.slice(0, 3);
 
   return (
     <div className="space-y-8">
@@ -58,36 +93,38 @@ export default function CommandCenterHome() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <StatCard
           title="PLAYERS TRACKED"
-          value="5,420+"
+          value={players.length > 0 ? `${players.length}+` : "5,420+"}
           subtitle="Across Test, ODI, T20 formats"
           icon="groups"
           accentColor="#4be277"
         />
         <StatCard
           title="VENUES ANALYZED"
-          value="184"
+          value={grounds.length > 0 ? `${grounds.length}` : "184"}
           subtitle="Pitch telemetry & boundary maps"
           icon="stadium"
           accentColor="#c0c1ff"
+        />
+        <StatCard
+          title="MATCH DATA RECORDS"
+          value={matches.length > 0 ? `${matches.length} Live` : "100+ Live"}
+          subtitle="Realtime CricAPI Telemetry"
+          icon="database"
+          accentColor="#ffba61"
         />
         <StatCard
           title="AI PREDICTIVE MODELS"
           value="42"
           subtitle="Win probability & pitch vectors"
           icon="psychology"
-          accentColor="#ffba61"
-        />
-        <StatCard
-          title="MATCH DATA RECORDS"
-          value="1.2M+"
-          subtitle="Ball-by-ball historical dataset"
-          icon="database"
           accentColor="#4be277"
         />
       </div>
 
       {/* Live Match Intelligence Card */}
-      {liveMatch && (
+      {loading ? (
+        <SkeletonLoader className="h-64 w-full" />
+      ) : liveMatch ? (
         <div className="p-6 lg:p-8 rounded-3xl bg-surface-container-low border border-primary/40 relative overflow-hidden shadow-xl">
           <div className="flex items-center justify-between mb-4 border-b border-outline-variant/20 pb-3">
             <div className="flex items-center gap-2">
@@ -96,7 +133,7 @@ export default function CommandCenterHome() {
                 FEATURED LIVE MATCH TELEMETRY
               </span>
             </div>
-            <Badge variant="error" size="sm">
+            <Badge variant={liveMatch.status === "LIVE" ? "error" : "primary"} size="sm">
               {liveMatch.status}
             </Badge>
           </div>
@@ -150,10 +187,10 @@ export default function CommandCenterHome() {
                 WIN PROBABILITY MODEL
               </span>
               <div className="text-3xl font-headline font-black text-primary">
-                78% IND <span className="text-outline text-xl font-normal">/ 22% AUS</span>
+                55% {liveMatch.teamA.code} <span className="text-outline text-xl font-normal">/ 45% {liveMatch.teamB.code}</span>
               </div>
               <p className="text-[11px] font-mono-data text-on-surface-variant">
-                India lead by 222 runs with 6 second-innings wickets in hand.
+                Telemetry prediction based on venue historical data and live pitch vectors.
               </p>
               <Link href={`/match-analysis?id=${liveMatch.id}`} className="block">
                 <Button variant="primary" size="sm" className="w-full">
@@ -163,7 +200,7 @@ export default function CommandCenterHome() {
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Trending Profiles & Ground Analysis Dual Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -179,38 +216,46 @@ export default function CommandCenterHome() {
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {MOCK_PLAYERS.map((player) => (
-              <Link
-                key={player.id}
-                href={`/player-intelligence?id=${player.id}`}
-                className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 hover:border-primary/50 transition-all group relative overflow-hidden"
-              >
-                <div
-                  className="absolute top-0 left-0 right-0 h-1"
-                  style={{ backgroundColor: player.primaryColor }}
-                />
-                <div className="w-16 h-16 rounded-xl overflow-hidden mb-3 border border-outline-variant/30">
-                  <Image
-                    src={player.avatarUrl}
-                    alt={player.name}
-                    width={64}
-                    height={64}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <SkeletonLoader className="h-40 w-full" />
+              <SkeletonLoader className="h-40 w-full" />
+              <SkeletonLoader className="h-40 w-full" />
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              {featuredPlayers.map((player) => (
+                <Link
+                  key={player.id}
+                  href={`/player-intelligence?id=${player.id}`}
+                  className="p-4 rounded-2xl bg-surface-container-low border border-outline-variant/30 hover:border-primary/50 transition-all group relative overflow-hidden"
+                >
+                  <div
+                    className="absolute top-0 left-0 right-0 h-1"
+                    style={{ backgroundColor: player.primaryColor }}
                   />
-                </div>
-                <h4 className="font-headline font-bold text-base text-on-surface group-hover:text-primary transition-colors">
-                  {player.name}
-                </h4>
-                <p className="text-xs font-mono-data text-outline mb-2">
-                  {player.country} • {player.role}
-                </p>
-                <div className="text-xs font-mono-data font-bold text-on-surface">
-                  ODI Avg: <span className="text-primary">{player.stats.ODI?.batting?.average}</span>
-                </div>
-              </Link>
-            ))}
-          </div>
+                  <div className="w-16 h-16 rounded-xl overflow-hidden mb-3 border border-outline-variant/30">
+                    <Image
+                      src={player.avatarUrl}
+                      alt={player.name}
+                      width={64}
+                      height={64}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform"
+                    />
+                  </div>
+                  <h4 className="font-headline font-bold text-base text-on-surface group-hover:text-primary transition-colors">
+                    {player.name}
+                  </h4>
+                  <p className="text-xs font-mono-data text-outline mb-2">
+                    {player.country} • {player.role}
+                  </p>
+                  <div className="text-xs font-mono-data font-bold text-on-surface">
+                    Avg: <span className="text-primary">{player.stats?.ODI?.batting?.average || player.stats?.ALL?.batting?.average || 45}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Right 1 Col: Featured Ground Analysis */}

@@ -1,15 +1,54 @@
 "use client";
 
-import React, { Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
-import { MOCK_MATCHES } from "@/lib/mockData/matches";
 import Badge from "@/components/common/Badge";
 import SkeletonLoader from "@/components/common/SkeletonLoader";
+import ErrorState from "@/components/common/ErrorState";
+import { Match } from "@/types/match";
+import { MatchService } from "@/services/matchService";
 
 function MatchAnalysisContent() {
   const searchParams = useSearchParams();
-  const matchId = searchParams.get("id") || "ind-vs-aus-bgt-test1";
-  const match = MOCK_MATCHES.find((m) => m.id === matchId) || MOCK_MATCHES[0];
+  const matchId = searchParams.get("id") || "";
+  const [match, setMatch] = useState<Match | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    async function loadMatch() {
+      try {
+        setLoading(true);
+        setError(null);
+        let data: Match | null = null;
+        if (matchId) {
+          data = await MatchService.getMatchById(matchId);
+        }
+        if (!data) {
+          const matches = await MatchService.getAllMatches();
+          data = matches[0] || null;
+        }
+        if (isMounted) setMatch(data);
+      } catch (err) {
+        if (isMounted) setError("Failed to load match telemetry.");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    }
+    loadMatch();
+    return () => {
+      isMounted = false;
+    };
+  }, [matchId]);
+
+  if (loading) {
+    return <SkeletonLoader className="h-96 w-full" />;
+  }
+
+  if (error || !match) {
+    return <ErrorState message={error || "Match profile not found."} />;
+  }
 
   return (
     <div className="space-y-8">

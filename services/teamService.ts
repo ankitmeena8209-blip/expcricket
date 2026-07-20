@@ -1,6 +1,7 @@
 import { Team } from "@/types/team";
 import { MOCK_TEAMS } from "@/lib/mockData/teams";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
+import { CricketDataService } from "@/services/cricketDataService";
 
 function withTimeout<T>(promise: PromiseLike<T>, ms: number = 3000): Promise<T> {
   return Promise.race([
@@ -32,6 +33,13 @@ export class TeamService {
         console.warn("Supabase teams query fallback:", err);
       }
     }
+
+    // Live Cricket API Fetch Fallback
+    const liveTeams = await CricketDataService.fetchLiveTeams();
+    if (liveTeams && liveTeams.length > 0) {
+      return liveTeams;
+    }
+
     return MOCK_TEAMS;
   }
 
@@ -57,8 +65,13 @@ export class TeamService {
         console.warn(`Supabase getTeamById(${id}) fallback:`, err);
       }
     }
-    const team = MOCK_TEAMS.find((t) => t.id === id);
-    return team || MOCK_TEAMS[0];
+
+    const allTeams = await this.getAllTeams();
+    const team = allTeams.find((t) => t.id === id);
+    if (team) return team;
+
+    const mockTeam = MOCK_TEAMS.find((t) => t.id === id);
+    return mockTeam || allTeams[0] || MOCK_TEAMS[0];
   }
 
   static async createTeam(team: Partial<Team>): Promise<boolean> {

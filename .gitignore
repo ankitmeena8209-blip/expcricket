@@ -9,6 +9,7 @@
 # Next.js Build Output
 /.next/
 /out/
+*.tsbuildinfo
 
 # Production Build
 /build
@@ -33,4 +34,3 @@ Thumbs.db
 # Large Extracted Artifacts
 /extracted
 *.zip
-
