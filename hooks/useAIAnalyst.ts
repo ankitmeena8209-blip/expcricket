@@ -13,10 +13,23 @@ export function useAIAnalyst() {
     if (!prompt.trim()) return;
     setLoading(true);
     try {
-      const response = await AIService.analyzeQuery({ prompt, contextType, provider });
-      setMessages((prev) => [...prev, response]);
+      console.log("[useAIAnalyst Client] Sending AI prompt to /api/ai endpoint:", prompt);
+      const res = await fetch("/api/ai", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, contextType, provider }),
+      });
+
+      const data = await res.json();
+      console.log("[useAIAnalyst Client] Received response from /api/ai:", data);
+
+      if (data.success && data.data) {
+        setMessages((prev) => [...prev, data.data]);
+      } else {
+        console.error("AI API returned error:", data.error);
+      }
     } catch (err) {
-      console.error("AI Service Error:", err);
+      console.error("AI Service Network Error:", err);
     } finally {
       setLoading(false);
     }

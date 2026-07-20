@@ -15,9 +15,11 @@ export function usePlayer(id?: string) {
       try {
         setLoading(true);
         setError(null);
-        const data = await PlayerService.getPlayerById(id || "virat-kohli");
+        console.log(`[usePlayer Hook] Loading player data for ID param: "${id || 'default'}"`);
+        const data = await PlayerService.getPlayerById(id || "");
         if (isMounted) setPlayer(data);
       } catch (err) {
+        console.error("[usePlayer Hook] Error loading player analytics:", err);
         if (isMounted) setError("Failed to load player analytics data.");
       } finally {
         if (isMounted) setLoading(false);
